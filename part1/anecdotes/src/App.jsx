@@ -16,8 +16,8 @@ const App = () => {
   const [votes, setVotes] = useState(Array(anecdotes.length).fill(0))
 
   const setRandomSelection = () => {
-    const randomAnecodeIndex = Math.floor(Math.random() * anecdotes.length)
-    setSelected(randomAnecodeIndex)
+    const randomAnecdoteIndex = Math.floor(Math.random() * anecdotes.length)
+    setSelected(randomAnecdoteIndex)
   }
 
   const getIndexWithMostVotes = () => {
