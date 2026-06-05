@@ -58,7 +58,9 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-  if (!request.body.name) {
+  if (!request.body) {
+    response.status(400).json({error: 'request body missing.'})
+  } else if (!request.body.name) {
     response.status(400).json({error: 'person name missing.'})
   } else if (!request.body.number) {
     response.status(400).json({error: 'person number missing.'})
