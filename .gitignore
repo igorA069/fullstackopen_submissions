@@ -1,2 +1,3 @@
 /part2/countries/src/OpenWatherMap.txt
-/part3/phonebook/node_modules
+node_modules
+dist

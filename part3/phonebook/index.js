@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 
 app.use(express.json())
-// app.use(express.static('dist'))
+app.use(express.static('dist'))
 
 const morgan = require('morgan')
 morgan.token('json-content', (req, res) => JSON.stringify(req.body))
