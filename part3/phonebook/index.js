@@ -34,6 +34,20 @@ let persons = [
     }
 ]
 
+const verifyReqBody = (request, response) => {
+  let isValid = false
+  if (!request.body) {
+    response.status(400).json({error: 'request body missing.'})
+  } else if (!request.body.name) {
+    response.status(400).json({error: 'person name missing.'})
+  } else if (!request.body.number) {
+    response.status(400).json({error: 'person number missing.'})
+  } else {
+    isValid = true
+  }
+  return isValid
+}
+
 app.get('/api/persons', (request, response) => {response.json(persons)})
 
 app.get('/info', (request, response) => { response.send(`
@@ -42,7 +56,7 @@ app.get('/info', (request, response) => { response.send(`
 
 app.get('/api/persons/:id', (request, response) => {
   const requestedId = request.params.id
-  const matchingPerson = persons.find(person => person.id === requestedId)
+  const matchingPerson = persons.find(person => person.id == requestedId)
   if (matchingPerson) {
     response.json(matchingPerson)
   } else {
@@ -52,19 +66,14 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
   const requestedId = request.params.id
-  filteredPersons = persons.filter(person => person.id !== requestedId)
+  filteredPersons = persons.filter(person => person.id != requestedId)
   persons = filteredPersons
   response.status(204).end()
 })
 
 app.post('/api/persons', (request, response) => {
-  if (!request.body) {
-    response.status(400).json({error: 'request body missing.'})
-  } else if (!request.body.name) {
-    response.status(400).json({error: 'person name missing.'})
-  } else if (!request.body.number) {
-    response.status(400).json({error: 'person number missing.'})
-  } else {
+  const isBodyValid = verifyReqBody(request, response)
+  if (isBodyValid) {
     const sameNameExists = persons.find(person => person.name === request.body.name)
     if (sameNameExists)
     {
@@ -73,6 +82,20 @@ app.post('/api/persons', (request, response) => {
       const newPerson = {...request.body, id: Math.floor(Math.random()*10000)}
       persons = persons.concat(newPerson)
       response.json(newPerson)
+    }
+  }
+})
+
+app.put('/api/persons/:id', (request, response) => {
+  const requestedId = request.params.id
+  const match = persons.find(person => person.id == requestedId)
+  if (verifyReqBody(request, response))
+  {
+    if (match) {
+      persons = persons.map(person => person.id == requestedId ? request.body : person)
+      response.status(200).end()
+    } else {
+      response.status(404).json({error: 'id not found'})
     }
   }
 })
