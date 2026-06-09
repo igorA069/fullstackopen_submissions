@@ -1,3 +1,4 @@
 /part2/countries/src/OpenWatherMap.txt
 node_modules
 dist
+mongodb.txt
