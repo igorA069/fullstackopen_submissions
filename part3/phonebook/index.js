@@ -78,15 +78,24 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
   const isBodyValid = verifyReqBody(request, response)
   if (isBodyValid) {
-    const sameNameExists = persons.find(person => person.name === request.body.name)
-    if (sameNameExists)
-    {
-      response.status(400).json({error: 'name must be unique'})
-    } else {
-      const newPerson = {...request.body, id: Math.floor(Math.random()*10000)}
-      persons = persons.concat(newPerson)
-      response.json(newPerson)
-    }
+    const newPerson = new PersonModel({
+      name: request.body.name,
+      number: request.body.number
+    })
+    newPerson.save().then(
+      result => {
+        response.json(result)
+      }
+    )
+    // const sameNameExists = persons.find(person => person.name === request.body.name)
+    // if (sameNameExists)
+    // {
+    //   response.status(400).json({error: 'name must be unique'})
+    // } else {
+    //   const newPerson = {...request.body, id: Math.floor(Math.random()*10000)}
+    //   persons = persons.concat(newPerson)
+    //   response.json(newPerson)
+    // }
   }
 })
 
