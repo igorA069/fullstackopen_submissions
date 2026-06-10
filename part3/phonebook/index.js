@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+const PersonModel = require('./models/person')
+
 app.use(express.json())
 app.use(express.static('dist'))
 
@@ -48,20 +50,22 @@ const verifyReqBody = (request, response) => {
   return isValid
 }
 
-app.get('/api/persons', (request, response) => {response.json(persons)})
+app.get('/api/persons', (request, response) => {
+  PersonModel.find({}).then(results => { response.json(results) })
+})
 
-app.get('/info', (request, response) => { response.send(`
-  <p>Phonebook has info for ${persons.length} people.</p>
-  <p>${new Date().toString()}</p>`) })
+app.get('/info', (request, response) => { 
+  PersonModel.find({}).then(results => {
+    response.send(`
+    <p>Phonebook has info for ${results.length} people.</p>
+    <p>${new Date().toString()}</p>`)}) 
+  })
 
 app.get('/api/persons/:id', (request, response) => {
   const requestedId = request.params.id
-  const matchingPerson = persons.find(person => person.id == requestedId)
-  if (matchingPerson) {
-    response.json(matchingPerson)
-  } else {
-    response.status(404).send(`Person id ${requestedId} does not exist.`)
-  }
+  PersonModel.findById(requestedId)
+    .then(result => {response.json(result)})
+    .catch(error => {response.status(404).json(error.message)})
 })
 
 app.delete('/api/persons/:id', (request, response) => {
