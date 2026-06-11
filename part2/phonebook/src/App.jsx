@@ -39,12 +39,16 @@ const App = () => {
         name: newName,
         number: newNumber
       }
-      personServices.add(newPerson).then(receivedPerson => setPersons(persons.concat(receivedPerson)))
+      personServices.add(newPerson)
+      .then(receivedPerson => {
+        setPersons(persons.concat(receivedPerson))
 
-      setNewName('')
-      setNewNumber('')
+        setNewName('')
+        setNewNumber('')
 
-      displayNotification(`Added ${newName}`, false)
+        displayNotification(`Added ${newName}`, false)
+      })
+      .catch(error => { displayNotification(error.response.data.error, true) })
     } else {
       if (window.confirm(`${newName} is already added to phonebook. Replace the old number with a new one?`))
       {

@@ -6,7 +6,11 @@ const db_url = process.env.MONGODB_CONNECT_STRING
 mongoose.connect(db_url)
 
 const personSchema = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        required: true,
+        minLength: 3
+    },
     number: String
 })
 

@@ -127,7 +127,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         result.name = request.body.name
         result.number = request.body.number
         result.save()
-        .then(response.json(result))
+        .then(result => response.json(result))
         .catch(error => next(error))
       } else {
         response.status(404).json({'error':`id ${requestedId} does not exist`})
@@ -141,6 +141,8 @@ const errorHandler = (error, request, response, next) => {
   console.log(error)
   if (error.name === 'CastError') {
     return response.status(400).json({'error': `Invalid person id ${error.value}`})
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({'error': error.message})
   }
   next(error)
 }
