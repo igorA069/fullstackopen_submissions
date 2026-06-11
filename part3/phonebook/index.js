@@ -70,14 +70,27 @@ app.get('/info', (request, response, next) => {
 app.get('/api/persons/:id', (request, response, next) => {
   const requestedId = request.params.id
   PersonModel.findById(requestedId)
-    .then(result => { response.json(result) })
+    .then(result => { 
+      if (result)
+      {
+        response.json(result) 
+      } else {
+        response.status(404).json({'error': `id ${requestedId} does not exist`})
+      }
+    })
     .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   const requestedId = request.params.id
   PersonModel.findByIdAndDelete(requestedId)
-  .then(result => { response.status(204).end() })
+  .then(result => { 
+    if (result) {
+      response.status(204).end() 
+    } else {
+      response.status(404).json({'error':`id ${requestedId} does not exist`})
+    }
+  })
   .catch(error => next(error)) 
 })
 
@@ -103,17 +116,24 @@ app.post('/api/persons', (request, response, next) => {
   }
 })
 
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
   const requestedId = request.params.id
-  const match = persons.find(person => person.id == requestedId)
   if (verifyReqBody(request, response))
   {
-    if (match) {
-      persons = persons.map(person => person.id == requestedId ? request.body : person)
-      response.status(200).end()
-    } else {
-      response.status(404).json({error: 'id not found'})
-    }
+    PersonModel.findById(requestedId)
+    .then(result => {
+      if (result)
+      {
+        result.name = request.body.name
+        result.number = request.body.number
+        result.save()
+        .then(response.json(result))
+        .catch(error => next(error))
+      } else {
+        response.status(404).json({'error':`id ${requestedId} does not exist`})
+      }
+    })
+    .catch(error => next(error))
   }
 })
 
