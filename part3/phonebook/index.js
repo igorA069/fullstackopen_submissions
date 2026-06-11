@@ -50,43 +50,47 @@ const verifyReqBody = (request, response) => {
   return isValid
 }
 
-app.get('/api/persons', (request, response) => {
-  PersonModel.find({}).then(results => { response.json(results) })
+app.get('/api/persons', (request, response, next) => {
+  PersonModel.find({})
+  .then(results => { response.json(results) })
+  .catch(error => next(error))
 })
 
-app.get('/info', (request, response) => { 
-  PersonModel.find({}).then(results => {
+app.get('/info', (request, response, next) => { 
+  PersonModel.find({})
+  .then(results => {
     response.send(`
     <p>Phonebook has info for ${results.length} people.</p>
-    <p>${new Date().toString()}</p>`)}) 
+    <p>${new Date().toString()}</p>`)
+  })
+  .catch(error => next(error))
+
   })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   const requestedId = request.params.id
   PersonModel.findById(requestedId)
-    .then(result => {response.json(result)})
-    .catch(error => {response.status(404).json(error.message)})
+    .then(result => { response.json(result) })
+    .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   const requestedId = request.params.id
-  PersonModel.findByIdAndDelete(requestedId).then(result => {
-    response.status(204).end()
-  }) 
+  PersonModel.findByIdAndDelete(requestedId)
+  .then(result => { response.status(204).end() })
+  .catch(error => next(error)) 
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const isBodyValid = verifyReqBody(request, response)
   if (isBodyValid) {
     const newPerson = new PersonModel({
       name: request.body.name,
       number: request.body.number
     })
-    newPerson.save().then(
-      result => {
-        response.json(result)
-      }
-    )
+    newPerson.save()
+    .then(result => { response.json(result) })
+    .catch(error => next(error))
     // const sameNameExists = persons.find(person => person.name === request.body.name)
     // if (sameNameExists)
     // {
@@ -112,6 +116,16 @@ app.put('/api/persons/:id', (request, response) => {
     }
   }
 })
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error)
+  if (error.name === 'CastError') {
+    return response.status(400).json({'error': `Invalid person id ${error.value}`})
+  }
+  next(error)
+}
+
+app.use(errorHandler)
 
 app.listen(3001, () => {
   console.log('Started')
