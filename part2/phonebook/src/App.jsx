@@ -60,9 +60,7 @@ const App = () => {
             onUpdatePerson(foundPerson, updatedPerson)
             displayNotification(`Updated number for ${newName}`, false)
           })
-          .catch((error) => {
-            displayNotification(`Information of ${foundPerson.name} have already been removed from server`, true)
-          })
+          .catch(error => { displayNotification(error.response.data.error, true) })
       }
     }
   }
@@ -80,6 +78,7 @@ const App = () => {
     {
       return personServices.deletePerson(personToDelete.id)
         .then(response => setPersons(persons.filter(person => person.id !== personToDelete.id)))
+        .catch(error => { displayNotification(error.response.data.error, true) })
     }
     else return null;
   }
