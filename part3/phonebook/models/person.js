@@ -11,7 +11,12 @@ const personSchema = new mongoose.Schema({
         required: true,
         minLength: 3
     },
-    number: String
+    number: {
+        type: String,
+        required: true,
+        minLength: 8,
+        match: /^[0-9]{2,3}-[0-9]+$/    // match 2 leading digits, followed by a dash, followed by more digits
+    }
 })
 
 personSchema.set('toJSON',{
