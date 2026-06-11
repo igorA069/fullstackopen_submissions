@@ -70,9 +70,9 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
   const requestedId = request.params.id
-  filteredPersons = persons.filter(person => person.id != requestedId)
-  persons = filteredPersons
-  response.status(204).end()
+  PersonModel.findByIdAndDelete(requestedId).then(result => {
+    response.status(204).end()
+  }) 
 })
 
 app.post('/api/persons', (request, response) => {
