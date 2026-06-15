@@ -1,109 +1,78 @@
-const { test, describe } = require('node:test')
-const assert = require('node:assert')
-const listHelper = require('../utils/list_helper')
+const { test, after, beforeEach } = require('node:test')
+const assert = require('assert')
+const supertest = require('supertest')
 
+const mongoose = require('mongoose')
+
+const app = require('../app')
 const Blog = require('../models/blog')
 
-test('dummy returns one', () => {
-    const blogs = []
-    assert.strictEqual(listHelper.dummy(blogs), 1)
+const api = supertest(app)
+
+const blogs = [
+  {
+    _id: "5a422a851b54a676234d17f7",
+    title: "React patterns",
+    author: "Michael Chan",
+    url: "https://reactpatterns.com/",
+    likes: 7,
+    __v: 0
+  },
+  {
+    _id: "5a422aa71b54a676234d17f8",
+    title: "Go To Statement Considered Harmful",
+    author: "Edsger W. Dijkstra",
+    url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+    likes: 5,
+    __v: 0
+  },
+  {
+    _id: "5a422b3a1b54a676234d17f9",
+    title: "Canonical string reduction",
+    author: "Edsger W. Dijkstra",
+    url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
+    likes: 12,
+    __v: 0
+  },
+  {
+    _id: "5a422b891b54a676234d17fa",
+    title: "First class tests",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+    likes: 10,
+    __v: 0
+  },
+  {
+    _id: "5a422ba71b54a676234d17fb",
+    title: "TDD harms architecture",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
+    likes: 0,
+    __v: 0
+  },
+  {
+    _id: "5a422bc61b54a676234d17fc",
+    title: "Type wars",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+    likes: 2,
+    __v: 0
+  }  
+]
+
+beforeEach(async () => {
+    await Blog.deleteMany({})
+    await new Blog(blogs[0]).save()
+    await new Blog(blogs[1]).save()
 })
 
-describe('totalLikes tests', () => {
-    test('totalLikes of empty array is 0', () => {
-        const blogs = []
-        assert.strictEqual(listHelper.totalLikes(blogs), 0)
-    })
-
-    test('totalLikes of an array with 1 element equals the likes of that element', () => {
-        const likesCount = 13
-        const blogs = [
-            new Blog({
-                title: "some title",
-                author: "some author",
-                url: "www.example.com",
-                likes: likesCount
-            })]
-        assert.strictEqual(listHelper.totalLikes(blogs), likesCount)
-    })
-
-    test('totalLikes of an array with multiple elements equals the sum of likes of those elements', () => {
-        const likesCount1 = 190
-        const likesCount2 = 1301
-        const blogs = [
-            new Blog({
-                title: "some title",
-                author: "some author",
-                url: "www.example.com",
-                likes: likesCount1
-            }),
-            new Blog({
-                title: "another title",
-                author: "another author",
-                url: "www.helloworld.com",
-                likes: likesCount2
-            })
-        ]
-        assert.strictEqual(listHelper.totalLikes(blogs), likesCount1 + likesCount2)
-    })
+test('GET returns correct amount of blog posts', async () => {
+    const response = await api.get('/api/blogs')
+    assert.strictEqual(response.status, 200)
+    assert.match(response.type, /application\/json/)
+    assert.strictEqual(response.body.length, 2)
 })
 
-describe('favoriteBlog tests', () => {
-    test('favoriteBlog of empty array is null', () => {
-        const blogs = []
-        assert.deepStrictEqual(listHelper.favoriteBlog(blogs), null)
-    })
-
-    test('favoriteBlog of an array with 1 element equals that element', () => {
-        const likesCount = 13
-        const blogs = [
-            new Blog({
-                title: "some title",
-                author: "some author",
-                url: "www.example.com",
-                likes: likesCount
-            })]
-        assert.deepStrictEqual(listHelper.favoriteBlog(blogs), blogs[0])
-    })
-
-    test('favoriteBlog of an array with multiple elements equals the blog with the most likes', () => {
-        const likesCount1 = 190
-        const likesCount2 = 1301
-        const blogs = [
-            new Blog({
-                title: "some title",
-                author: "some author",
-                url: "www.example.com",
-                likes: likesCount1
-            }),
-            new Blog({
-                title: "another title",
-                author: "another author",
-                url: "www.helloworld.com",
-                likes: likesCount2
-            })
-        ]
-        assert.deepStrictEqual(listHelper.favoriteBlog(blogs), blogs[1])
-    })
-
-    test('favoriteBlog of an array with multiple elements equals the blog with the most likes', () => {
-        const likesCount1 = 190
-        const likesCount2 = 1301
-        const blogs = [
-            new Blog({
-                title: "another title",
-                author: "another author",
-                url: "www.helloworld.com",
-                likes: likesCount2
-            }),
-            new Blog({
-                title: "some title",
-                author: "some author",
-                url: "www.example.com",
-                likes: likesCount1
-            })
-        ]
-        assert.deepStrictEqual(listHelper.favoriteBlog(blogs), blogs[0])
-    })
-
+after(async () => {
+    await mongoose.connection.close()
 })
