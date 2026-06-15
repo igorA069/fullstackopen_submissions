@@ -70,7 +70,16 @@ test('GET returns correct amount of blog posts', async () => {
     const response = await api.get('/api/blogs')
     assert.strictEqual(response.status, 200)
     assert.match(response.type, /application\/json/)
+    assert.notEqual(response.body, null)
     assert.strictEqual(response.body.length, 2)
+})
+
+test('Blogs have an id', async () => {
+    const response = await api.get('/api/blogs')
+    assert.notEqual(response.body, null)
+    response.body.forEach(blog => {
+        assert.notStrictEqual(blog.id, undefined)
+    })
 })
 
 after(async () => {
