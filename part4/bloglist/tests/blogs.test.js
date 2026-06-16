@@ -109,7 +109,7 @@ test('POST correctly adds a blog post', async () => {
 })
 
 test('If a blog post without "likes" property is added, it defaults to 0', async () => {
-  const newBlog = blogs[initialBlogCount]
+  const newBlog = { ...blogs[initialBlogCount] }
   // Artificially remove the property
   delete newBlog.likes
   await api
@@ -126,6 +126,26 @@ test('If a blog post without "likes" property is added, it defaults to 0', async
   // Check that the "likes" property is 0
   const matchingStoredBlog = storedBlogs.find(blog => blog.id === newBlog._id)
   assert.strictEqual(matchingStoredBlog.likes, 0)
+})
+
+test('Attempt to add a blog post without title results in a 400 error', async () => {
+  const newBlog = { ...blogs[initialBlogCount] }
+  // Artificially remove the property
+  delete newBlog.title
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+})
+
+test('Attempt to add a blog post without url results in a 400 error', async () => {
+  const newBlog = { ...blogs[initialBlogCount] }
+  // Artificially remove the property
+  delete newBlog.url
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
 })
 
 after(async () => {
