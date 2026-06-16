@@ -28,4 +28,17 @@ blogRouter.delete('/blogs/:id', async (request, response) => {
   response.status(204).end()
 })
 
+blogRouter.put('/blogs/:id', async (request, response) => {
+  const blogToUpdate = await Blog.findById(request.params.id)
+  if (request.body != null)
+  {
+    // For now, assuming that only the like counts get updated
+    blogToUpdate.likes = request.body.likes
+    await blogToUpdate.save()
+    response.status(200).end()
+  } else {
+    response.status(400).json({'error': 'request body missing'})
+  }
+})
+
 module.exports = blogRouter

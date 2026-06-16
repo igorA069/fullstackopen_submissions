@@ -112,6 +112,21 @@ test('Delete a blog post', async () => {
   assert.ok(!allBlogs.map(blog => blog.id).includes(blogId))
 })
 
+test('Update a blog post', async () => {
+  const existingBlog = initialBlogs[0]
+  const blogId = existingBlog._id
+  const updatedLikes = existingBlog.likes + 1
+  const updatedBlog = {...existingBlog, likes: updatedLikes }
+  await api
+    .put(`/api/blogs/${blogId}`)
+    .send(updatedBlog)
+    .expect(200)
+
+  const storedBlogs = await getStoredBlogs()
+  // Check that the likes count is updated in DB
+  assert.strictEqual(storedBlogs.find(blog => blog.id === blogId).likes, updatedLikes)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
