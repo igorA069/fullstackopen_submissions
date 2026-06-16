@@ -68,7 +68,7 @@ beforeEach(async () => {
     await Blog.insertMany(initialBlogs)
 })
 
-test('GET returns correct amount of blog posts', async () => {
+test('GET returns the expected blog posts', async () => {
     const response = await api.get('/api/blogs')
     // Check metadata:
     assert.strictEqual(response.status, 200)
@@ -85,7 +85,7 @@ test('GET returns correct amount of blog posts', async () => {
     })
 })
 
-test('Blogs have an id', async () => {
+test('Blog posts have an id', async () => {
     const response = await api.get('/api/blogs')
     assert.notEqual(response.body, null)
     response.body.forEach(blog => {
@@ -93,18 +93,39 @@ test('Blogs have an id', async () => {
     })
 })
 
-test('POST works', async () => {
+test('POST correctly adds a blog post', async () => {
   const newBlog = blogs[initialBlogCount]
   await api
     .post('/api/blogs')
     .send(newBlog)
     .expect(201)
+
   const storedBlogs = await Blog.find({})
   // Check that the element count is incremented 
   assert.strictEqual(storedBlogs.length, initialBlogCount + 1)
   // Check that the new id is present
   const storedIds = storedBlogs.map(blog => blog.id)
   assert.ok(storedIds.includes(newBlog._id))
+})
+
+test('If a blog post without "likes" property is added, it defaults to 0', async () => {
+  const newBlog = blogs[initialBlogCount]
+  // Artificially remove the property
+  delete newBlog.likes
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+
+  const storedBlogs = await Blog.find({})
+  // Check that the element count is incremented 
+  assert.strictEqual(storedBlogs.length, initialBlogCount + 1)
+  // Check that the new id is present
+  const storedIds = storedBlogs.map(blog => blog.id)
+  assert.ok(storedIds.includes(newBlog._id))
+  // Check that the "likes" property is 0
+  const matchingStoredBlog = storedBlogs.find(blog => blog.id === newBlog._id)
+  assert.strictEqual(matchingStoredBlog.likes, 0)
 })
 
 after(async () => {
