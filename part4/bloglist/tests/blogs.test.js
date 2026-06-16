@@ -60,18 +60,29 @@ const blogs = [
   }  
 ]
 
+const initialBlogCount = 2
+const initialBlogs = blogs.slice(0,2)
+
 beforeEach(async () => {
     await Blog.deleteMany({})
-    await new Blog(blogs[0]).save()
-    await new Blog(blogs[1]).save()
+    await Blog.insertMany(initialBlogs)
 })
 
 test('GET returns correct amount of blog posts', async () => {
     const response = await api.get('/api/blogs')
+    // Check metadata:
     assert.strictEqual(response.status, 200)
     assert.match(response.type, /application\/json/)
-    assert.notEqual(response.body, null)
-    assert.strictEqual(response.body.length, 2)
+    // Check contents:
+    const returnedBlogs = response.body
+    assert.notEqual(returnedBlogs, null)
+    // Check equality of element count and ids
+    assert.strictEqual(returnedBlogs.length, initialBlogs.length)
+    const insertedIds = initialBlogs.map(blog => blog._id)
+    const returnedIds = returnedBlogs.map(blog => blog.id)
+    insertedIds.forEach(id => {
+      assert.ok(returnedIds.includes(id))
+    })
 })
 
 test('Blogs have an id', async () => {
@@ -80,6 +91,20 @@ test('Blogs have an id', async () => {
     response.body.forEach(blog => {
         assert.notStrictEqual(blog.id, undefined)
     })
+})
+
+test('POST works', async () => {
+  const newBlog = blogs[initialBlogCount]
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+  const storedBlogs = await Blog.find({})
+  // Check that the element count is incremented 
+  assert.strictEqual(storedBlogs.length, initialBlogCount + 1)
+  // Check that the new id is present
+  const storedIds = storedBlogs.map(blog => blog.id)
+  assert.ok(storedIds.includes(newBlog._id))
 })
 
 after(async () => {
