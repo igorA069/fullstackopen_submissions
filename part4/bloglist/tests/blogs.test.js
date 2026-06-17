@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')  // TODO: remove temporary hack later, when newly created blogs are not just linked to user #1 in DB
 
 const api = supertest(app)
 
@@ -17,6 +18,15 @@ const initialBlogs = testBlogs.slice(0,2)
 beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(initialBlogs)
+    
+    // TODO: remove temporary hack later, when newly created blogs are not just linked to user #1 in DB
+    // Note that this hack introduce interference with tests of user controller, so multithreaded execution must be disabled
+    await User.deleteMany({})
+    await new User({
+      username:'test_username',
+      name:'test_name',
+      password:'test_password'
+    }).save()
 })
 
 test('GET returns the expected blog posts', async () => {
