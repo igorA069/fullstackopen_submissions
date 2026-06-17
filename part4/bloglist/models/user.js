@@ -10,7 +10,11 @@ const userSchema = mongoose.Schema({
         unique: true
     },
     name: String,
-    hashedPassword: String
+    hashedPassword: String,
+    blogs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Blog'
+    }]
 })
 
 userSchema.set('toJSON', {
@@ -22,6 +26,6 @@ userSchema.set('toJSON', {
     }
 })
 
-const User = mongoose.model('user', userSchema)
+const User = mongoose.model('User', userSchema)
 
 module.exports = User
