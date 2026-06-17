@@ -3,9 +3,15 @@ const bcrypt = require('bcrypt')
 const User = require('../models/user')
 const usersRouter = require('express').Router()
 
-usersRouter.post('/users', async (request, response) => {
+const config = require('../config/config')
+
+usersRouter.post('/users', async (request, response, next) => {
     if (request.body)
     {   
+        if (request.body.password === undefined ||
+            request.body.password.length < config.MIN_RAW_PASSWORD_LENGTH) {
+                return response.status(400).json({'error': `Password must be given and be at least ${config.MIN_RAW_PASSWORD_LENGTH} characters long`})
+            }
         const saltRounds = 10
         const hashedPassword = await bcrypt.hash(request.body.password, saltRounds)
         const newUser = new User({
@@ -13,7 +19,17 @@ usersRouter.post('/users', async (request, response) => {
             name: request.body.name,
             hashedPassword
         })
-        await newUser.save()
+        try {
+            await newUser.save()
+        } catch (error) {
+            console.log(error)
+            if (error.name==='ValidationError') {
+                return response.status(400).json({'error': error.message})
+            } else if (error.name==='MongoServerError' && error.message.includes('E11000 duplicate key error')) {
+                return response.status(400).json({'error': error.message})
+            }
+            next(error)
+        }
         response.status(201).end()
     }
 })
