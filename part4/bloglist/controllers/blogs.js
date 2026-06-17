@@ -1,9 +1,10 @@
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const blogRouter = require('express').Router()
 
 blogRouter.get('/blogs', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', {username:1, name:1, id:1})
   response.json(blogs)
 })
 
@@ -13,7 +14,16 @@ blogRouter.post('/blogs', async (request, response, next) => {
     blog.likes = 0
   }
   try {
+    // Link to first user
+    const users = await User.find({})
+    const user = users[0]
+    blog.user = user._id
     const result = await blog.save()
+    
+    // Link that user to this blog
+    user.blogs = user.blogs.concat(blog._id)
+    await users[0].save()
+
     response.status(201).json(result)
   } catch (error) {
     if (error.name === "ValidationError") {
