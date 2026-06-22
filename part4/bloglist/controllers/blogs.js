@@ -1,6 +1,10 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+const requestValidator = require('../middleware/requestValidator')
+const authentication = require('../middleware/authentication')
+const { errorHandler } = require('../middleware/errorHandler')
+
 const blogRouter = require('express').Router()
 
 blogRouter.get('/blogs', async (request, response) => {
@@ -8,23 +12,30 @@ blogRouter.get('/blogs', async (request, response) => {
   response.json(blogs)
 })
 
-blogRouter.post('/blogs', async (request, response, next) => {
+blogRouter.post('/blogs', requestValidator.checkHasBody, authentication.extractUser, async (request, response, next) => {
   const blog = new Blog(request.body)
   if (blog.likes === undefined) {
     blog.likes = 0
   }
   try {
-    // Link to first user
-    const users = await User.find({})
-    const user = users[0]
+    // Link to user referenced in the token
+    const user = await User.findOne({username: request.usernameInToken})
+    if (!user) {
+      return response.status(400).json({'error': 'invalid_grant'})
+    }
+
     blog.user = user._id
-    const result = await blog.save()
+    const result = await blog.save()  // may throw a ValidationError
     
     // Link that user to this blog
-    user.blogs = user.blogs.concat(blog._id)
-    await users[0].save()
+    if (user.blogs === undefined) {
+      user.blogs = [blog._id]
+    } else {
+      user.blogs = user.blogs.concat(blog._id)
+    }
+    await user.save() // may throw a ValidationError
 
-    response.status(201).json(result)
+    return response.status(201).json(result)
   } catch (error) {
     if (error.name === "ValidationError") {
       return response.status(400).json({'error': error.message})
@@ -38,17 +49,15 @@ blogRouter.delete('/blogs/:id', async (request, response) => {
   response.status(204).end()
 })
 
-blogRouter.put('/blogs/:id', async (request, response) => {
+blogRouter.put('/blogs/:id', requestValidator.checkHasBody, async (request, response) => {
   const blogToUpdate = await Blog.findById(request.params.id)
-  if (request.body != null)
-  {
-    // For now, assuming that only the like counts get updated
-    blogToUpdate.likes = request.body.likes
-    await blogToUpdate.save()
-    response.status(200).end()
-  } else {
-    response.status(400).json({'error': 'request body missing'})
-  }
+
+  // For now, assuming that only the like counts get updated
+  blogToUpdate.likes = request.body.likes
+  await blogToUpdate.save()
+  response.status(200).end()
 })
+
+blogRouter.use(errorHandler)
 
 module.exports = blogRouter
