@@ -2,7 +2,7 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 
 const requestValidator = require('../middleware/requestValidator')
-const authentication = require('../middleware/authentication')
+const userExtractor = require('../middleware/userExtractor')
 const { errorHandler } = require('../middleware/errorHandler')
 
 const blogRouter = require('express').Router()
@@ -12,14 +12,14 @@ blogRouter.get('/blogs', async (request, response) => {
   response.json(blogs)
 })
 
-blogRouter.post('/blogs', requestValidator.checkHasBody, authentication.extractUser, async (request, response, next) => {
+blogRouter.post('/blogs', requestValidator.checkHasBody, userExtractor, async (request, response, next) => {
   const blog = new Blog(request.body)
   if (blog.likes === undefined) {
     blog.likes = 0
   }
   try {
     // Link to user referenced in the token
-    const user = await User.findOne({username: request.usernameInToken})
+    const user = await User.findOne({username: request.user})
     if (!user) {
       return response.status(400).json({'error': 'invalid_grant'})
     }
