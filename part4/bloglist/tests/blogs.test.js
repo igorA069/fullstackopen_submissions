@@ -122,6 +122,14 @@ test('Attempt to add a blog post without url results in a 400 error', async () =
     .expect(400)
 })
 
+test('Attempt to add a blog post without a token results in a 401 error', async () => {
+  const newBlog = { ...testBlogs[initialBlogCount] }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
+})
+
 test('Delete a blog post', async () => {
   const blogId = initialBlogs[0]._id
   await api
