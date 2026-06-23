@@ -4,6 +4,9 @@ const errorHandler = (error, req, res, next) => {
     ) {
         return res.status(400).json({'error': 'invalid_grant'})
     }
+    if (error.name === 'CastError') {
+        return res.status(404).json({'error': 'resource not found'})
+    }
     next(error)
 }
 

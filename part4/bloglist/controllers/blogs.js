@@ -44,8 +44,25 @@ blogRouter.post('/blogs', requestValidator.checkHasBody, userExtractor, async (r
   }
 })
 
-blogRouter.delete('/blogs/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
+blogRouter.delete('/blogs/:id', userExtractor, async (request, response) => {
+  const foundBlog = await Blog.findById(request.params.id)
+  if (!foundBlog) {
+    return response.status(404).json({'error': 'resource not found'})
+  } 
+  const userIdFromBlog = (
+    foundBlog.user?._id ||  // if blog is populated with user
+    foundBlog.user)         // if blog.user is just an id
+
+  const userFromTokenInDb = await User.findOne({ username: request.user })
+  if (!userFromTokenInDb) {
+    return response.status(403).json({'error': 'token references unknown user'})
+  }
+
+  // check if the requesting user is the one who created the document
+  if (userIdFromBlog?.toString() !== userFromTokenInDb._id.toString()) {
+    return response.status(403).json({'error': 'user requesting deletion must be the creator of the resource'})
+  }
+  await foundBlog.deleteOne()
   response.status(204).end()
 })
 
