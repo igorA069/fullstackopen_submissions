@@ -22,7 +22,6 @@ usersRouter.post('/users', async (request, response, next) => {
         try {
             await newUser.save()
         } catch (error) {
-            console.log(error)
             if (error.name==='ValidationError') {
                 return response.status(400).json({'error': error.message})
             } else if (error.name==='MongoServerError' && error.message.includes('E11000 duplicate key error')) {
