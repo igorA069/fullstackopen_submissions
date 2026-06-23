@@ -1,8 +1,27 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
-const listHelper = require('../utils/list_helper')
 
+const listHelper = require('../utils/list_helper')
+const test_helper = require('./test_helper')
 const Blog = require('../models/blog')
+
+test('mostBlogs tests', () => {
+    const expectedResult = {
+        author: 'Robert C. Martin',
+        blogs: 3
+    }
+    const actualResult = listHelper.mostBlogs(test_helper.testBlogs)
+    assert.deepStrictEqual(expectedResult, actualResult)
+})
+
+test('mostLikes tests', () => {
+    const expectedResult = {
+        author: 'Edsger W. Dijkstra',
+        likes: 17
+    }
+    const actualResult = listHelper.mostLikes(test_helper.testBlogs)
+    assert.deepStrictEqual(expectedResult, actualResult)
+})
 
 test('dummy returns one', () => {
     const blogs = []
