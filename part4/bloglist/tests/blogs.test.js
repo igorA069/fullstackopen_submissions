@@ -2,31 +2,40 @@ const { test, after, beforeEach } = require('node:test')
 const assert = require('assert')
 const supertest = require('supertest')
 
+const jwt = require('jsonwebtoken')
+
 const mongoose = require('mongoose')
 
 const app = require('../app')
 const Blog = require('../models/blog')
-const User = require('../models/user')  // TODO: remove temporary hack later, when newly created blogs are not just linked to user #1 in DB
+const User = require('../models/user')
 
 const api = supertest(app)
 
 const { testBlogs, getStoredBlogs } = require('./test_helper')
+const config = require('../config/config')
 
 const initialBlogCount = 2
 const initialBlogs = testBlogs.slice(0,2)
+let initialUserEncodedToken
 
 beforeEach(async () => {
-    await Blog.deleteMany({})
-    await Blog.insertMany(initialBlogs)
-    
-    // TODO: remove temporary hack later, when newly created blogs are not just linked to user #1 in DB
-    // Note that this hack introduce interference with tests of user controller, so multithreaded execution must be disabled
+    // Note that this causes interference with tests of user controller, so multithreaded execution must be disabled
     await User.deleteMany({})
-    await new User({
+    const initialUser = new User({
       username:'test_username',
       name:'test_name',
       password:'test_password'
-    }).save()
+    })
+    await initialUser.save()
+    const token = {username: initialUser.username}
+    initialUserEncodedToken = await jwt.sign(token, config.AUTH_TOKEN_SECRET)
+
+    await Blog.deleteMany({})
+    // Assign a user to the blogs
+    const initialBlogsCopy = [...initialBlogs]
+    initialBlogsCopy.forEach(blog => blog.user = initialUser._id)
+    await Blog.insertMany(initialBlogsCopy)
 })
 
 test('GET returns the expected blog posts', async () => {
@@ -58,6 +67,7 @@ test('POST correctly adds a blog post', async () => {
   const newBlog = testBlogs[initialBlogCount]
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${initialUserEncodedToken}`)
     .send(newBlog)
     .expect(201)
 
@@ -75,6 +85,7 @@ test('If a blog post without "likes" property is added, it defaults to 0', async
   delete newBlog.likes
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${initialUserEncodedToken}`)
     .send(newBlog)
     .expect(201)
 
@@ -95,6 +106,7 @@ test('Attempt to add a blog post without title results in a 400 error', async ()
   delete newBlog.title
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${initialUserEncodedToken}`)
     .send(newBlog)
     .expect(400)
 })
@@ -105,6 +117,7 @@ test('Attempt to add a blog post without url results in a 400 error', async () =
   delete newBlog.url
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${initialUserEncodedToken}`)
     .send(newBlog)
     .expect(400)
 })
@@ -113,6 +126,7 @@ test('Delete a blog post', async () => {
   const blogId = initialBlogs[0]._id
   await api
     .delete(`/api/blogs/${blogId}`)
+    .set('Authorization', `Bearer ${initialUserEncodedToken}`)
     .expect(204)
 
   const allBlogs = await getStoredBlogs()
