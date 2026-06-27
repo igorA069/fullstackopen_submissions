@@ -6,4 +6,8 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
-export default { getAll }
+const add = async (title, author, url, accessToken) => {
+  await axios.post(baseUrl, {title, author, url}, {headers: {Authorization: `Bearer ${accessToken}`}}) 
+}
+
+export default { getAll, add } 
