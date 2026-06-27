@@ -14,6 +14,8 @@ const LoginForm = (props) => {
             // if successfull, store the token
             props.setAccessToken(accessToken)
             props.setLoggedInUserName(username)
+
+            window.localStorage.setItem('blogApplication.loggedInUserName', username)
         } catch (error) {
             console.log(error)
         }
