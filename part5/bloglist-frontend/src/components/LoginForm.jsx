@@ -16,6 +16,7 @@ const LoginForm = (props) => {
             props.setLoggedInUserName(username)
 
             window.localStorage.setItem('blogApplication.loggedInUserName', username)
+            window.localStorage.setItem('blogApplication.accessToken', accessToken)
         } catch (error) {
             const isError = true
             props.showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)

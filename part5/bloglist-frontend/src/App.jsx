@@ -4,6 +4,7 @@ import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import CreateBlogForm from './components/CreateBlogForm'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
 import blogService from './services/blogs'
 
@@ -22,10 +23,12 @@ const App = () => {
 
   useEffect(() => {
     setLoggedInUserName(window.localStorage.getItem('blogApplication.loggedInUserName'))
+    setAccessToken(window.localStorage.getItem('blogApplication.accessToken'))
   }, [])
 
   const logout = () => {
     window.localStorage.removeItem('blogApplication.loggedInUserName')
+    window.localStorage.removeItem('blogApplication.accessToken')
     setLoggedInUserName(null)
   }
 
@@ -44,7 +47,9 @@ const App = () => {
         <h2>blogs</h2>
         <Notification text={notification} isError={isNotificationError}/>
         <p>{loggedInUserName} logged in<button onClick={logout}>logout</button></p>
-        <CreateBlogForm accessToken={accessToken} showNotification={showNotification} blogs={blogs} setBlogs={setBlogs}></CreateBlogForm>
+        <Togglable>
+          <CreateBlogForm accessToken={accessToken} showNotification={showNotification} blogs={blogs} setBlogs={setBlogs} />
+        </Togglable>
         <br/>
         { blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
