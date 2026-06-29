@@ -6,9 +6,21 @@ const CreateBlogForm = (props) => {
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
 
-    const onSubmit = (event) => {
+    const onSubmit = async (event) => {
         event.preventDefault()
-        blogService.add(title, author, url, props.accessToken)
+
+        try {
+            await blogService.add(title, author, url, props.accessToken)
+            props.setBlogs([...props.blogs, {title, author, url}])
+            const isError = false
+            props.showNotification(`a new blog "${title}" by ${author} added.`, isError)
+            setTitle('')
+            setAuthor('')
+            setUrl('')
+        } catch (error) {
+            const isError = true
+            props.showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
+        }
     }
 
     return (
