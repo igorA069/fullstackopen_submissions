@@ -6,11 +6,12 @@ import CreateBlogForm from './components/CreateBlogForm'
 import Notification from './components/Notification'
 
 import blogService from './services/blogs'
+import login from "./services/login"
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [accessToken, setAccessToken] = useState(null)
-  const [loggedInUserName, setLoggedInUserName] = useState(null)
+  const [username, setUsername] = useState('')
   const [notification, setNotification] = useState('')
   const [isNotificationError, setIsNotificationError] = useState(false)
 
@@ -21,14 +22,31 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    setLoggedInUserName(window.localStorage.getItem('blogApplication.loggedInUserName'))
+    setUsername(window.localStorage.getItem('blogApplication.loggedInUserName'))
     setAccessToken(window.localStorage.getItem('blogApplication.accessToken'))
   }, [])
+
+  const onLogin = async (username, password) => {
+    // attempt to login
+    try {
+        const accessToken = await login(username, password)
+        // if successfull, store the token
+        setAccessToken(accessToken)
+        setUsername(username)
+
+        window.localStorage.setItem('blogApplication.loggedInUserName', username)
+        window.localStorage.setItem('blogApplication.accessToken', accessToken)
+    } catch (error) {
+        const isError = true
+        showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
+    }
+  }
 
   const logout = () => {
     window.localStorage.removeItem('blogApplication.loggedInUserName')
     window.localStorage.removeItem('blogApplication.accessToken')
-    setLoggedInUserName(null)
+    setUsername(null)
+    setAccessToken(null)
   }
 
   const showNotification = (message, isError) => {
@@ -39,13 +57,13 @@ const App = () => {
     }, 3000)
   }
 
-  if (loggedInUserName) {
+  if (username) {
     // user is logged in
     return (
       <div>
         <h2>blogs</h2>
         <Notification text={notification} isError={isNotificationError}/>
-        <p>{loggedInUserName} logged in<button onClick={logout}>logout</button></p>
+        <p>{username} logged in<button onClick={logout}>logout</button></p>
         <CreateBlogForm accessToken={accessToken} showNotification={showNotification} blogs={blogs} setBlogs={setBlogs} />
         <br/>
         { blogs.map(blog =>
@@ -57,7 +75,7 @@ const App = () => {
     return (
       <div>
         <Notification text={notification} isError={isNotificationError}/>
-        <LoginForm setAccessToken={setAccessToken} setLoggedInUserName={setLoggedInUserName} showNotification={showNotification} />
+        <LoginForm onSubmit={ onLogin } />
       </div>)
   }
 }

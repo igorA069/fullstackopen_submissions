@@ -1,42 +1,29 @@
 import { useState } from "react"
-import login from "../services/login"
 
-const LoginForm = (props) => {
+const LoginForm = ({ onSubmit }) => {
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('') 
 
-    const onSubmit = async (event) => {
+    const internalOnSubmit = (event) => {
         event.preventDefault()
-        // attempt to login
-        try {
-            const accessToken = await login(username, password)
-            // if successfull, store the token
-            props.setAccessToken(accessToken)
-            props.setLoggedInUserName(username)
-
-            window.localStorage.setItem('blogApplication.loggedInUserName', username)
-            window.localStorage.setItem('blogApplication.accessToken', accessToken)
-        } catch (error) {
-            const isError = true
-            props.showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
-        }
+        onSubmit(username, password)
     }
 
     return (
     <div>
     <h2>log in to application</h2>
-    <form onSubmit={ onSubmit }>
+    <form onSubmit={ event => internalOnSubmit(event) }>
         <div>
             <label>
                 username
-                <input value={username} onChange={(event) => setUsername(event.target.value)} type='text'/>
+                <input value={ username } onChange={ event => setUsername(event.target.value) } type='text'/>
             </label>
         </div>
         <div>
             <label>
                 password
-                <input value={password} onChange={(event) => setPassword(event.target.value)} type='password'/>
+                <input value={ password } onChange={ event => setPassword(event.target.value) } type='password'/>
             </label>
         </div>
         <button type='submit'>login</button>
