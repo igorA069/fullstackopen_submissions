@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
 
-const CreateBlogForm = (props) => {
+const CreateBlogForm = ({ onSubmit }) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
@@ -9,29 +9,21 @@ const CreateBlogForm = (props) => {
 
     const toggleVisible = () => setVisible(!isVisible)
 
-    const onSubmit = async (event) => {
+    const internalOnSubmit = async (event) => {
         event.preventDefault()
 
-        try {
-            await blogService.add(title, author, url, props.accessToken)
-            props.setBlogs([...props.blogs, {title, author, url}])
-            const isError = false
-            props.showNotification(`a new blog "${title}" by ${author} added.`, isError)
-            setTitle('')
-            setAuthor('')
-            setUrl('')
-            toggleVisible()
-        } catch (error) {
-            const isError = true
-            props.showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
-        }
+        await onSubmit(title, author, url)
+        setTitle('')
+        setAuthor('')
+        setUrl('')
+        toggleVisible()
     }
 
     if (isVisible) {
         return (
         <div>
             <h2>create new</h2>
-            <form onSubmit={onSubmit}>
+            <form onSubmit={ internalOnSubmit }>
                 <div>
                     <label>
                         title

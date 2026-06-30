@@ -42,6 +42,18 @@ const App = () => {
     }
   }
 
+  const onCreateBlog = async (title, author, url) => {
+    try {
+      await blogService.add(title, author, url, accessToken)
+      setBlogs([...blogs, { title, author, url }])
+      const isError = false
+      showNotification(`a new blog "${title}" by ${author} added.`, isError)
+    } catch (error) {
+        const isError = true
+        showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
+    }
+  }
+
   const logout = () => {
     window.localStorage.removeItem('blogApplication.loggedInUserName')
     window.localStorage.removeItem('blogApplication.accessToken')
@@ -64,7 +76,7 @@ const App = () => {
         <h2>blogs</h2>
         <Notification text={notification} isError={isNotificationError}/>
         <p>{username} logged in<button onClick={logout}>logout</button></p>
-        <CreateBlogForm accessToken={accessToken} showNotification={showNotification} blogs={blogs} setBlogs={setBlogs} />
+        <CreateBlogForm onSubmit={ onCreateBlog } />
         <br/>
         { blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
