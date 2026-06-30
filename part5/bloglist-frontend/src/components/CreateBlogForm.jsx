@@ -5,6 +5,9 @@ const CreateBlogForm = (props) => {
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
+    const [isVisible, setVisible] = useState(false)
+
+    const toggleVisible = () => setVisible(!isVisible)
 
     const onSubmit = async (event) => {
         event.preventDefault()
@@ -17,39 +20,49 @@ const CreateBlogForm = (props) => {
             setTitle('')
             setAuthor('')
             setUrl('')
+            toggleVisible()
         } catch (error) {
             const isError = true
             props.showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
         }
     }
 
-    return (
-    <div>
-        <h2>create new</h2>
-        <form onSubmit={onSubmit}>
+    if (isVisible) {
+        return (
+        <div>
+            <h2>create new</h2>
+            <form onSubmit={onSubmit}>
+                <div>
+                    <label>
+                        title
+                        <input value={title} onChange={ (event) => setTitle(event.target.value) }></input> 
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        author
+                        <input value={author} onChange={ (event) => setAuthor(event.target.value) }></input> 
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        url
+                        <input value={url} onChange={ (event) => setUrl(event.target.value) }></input> 
+                    </label>
+                </div>
+                <div>
+                    <button type='submit'>create</button>
+                </div>
+            </form>
+            <button onClick={toggleVisible}>cancel</button>
+        </div>
+    )} else {
+        return (
             <div>
-                <label>
-                    title
-                    <input value={title} onChange={ (event) => setTitle(event.target.value) }></input> 
-                </label>
+                <button onClick={toggleVisible}>create new blog</button>
             </div>
-            <div>
-                <label>
-                    author
-                    <input value={author} onChange={ (event) => setAuthor(event.target.value) }></input> 
-                </label>
-            </div>
-            <div>
-                <label>
-                    url
-                    <input value={url} onChange={ (event) => setUrl(event.target.value) }></input> 
-                </label>
-            </div>
-            <div>
-                <button type='submit'>create</button>
-            </div>
-        </form>
-    </div>
-)}
+        )
+    }
+}
 
 export default CreateBlogForm
