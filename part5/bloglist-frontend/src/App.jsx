@@ -54,6 +54,16 @@ const App = () => {
     }
   }
 
+  const onLikeBlog = async (blog) => {
+    try {
+      await blogService.like(blog, accessToken)
+      setBlogs(blogs.map(iterBlog => ((iterBlog.id === blog.id) ? {...iterBlog, likes: iterBlog.likes + 1} : iterBlog)))
+    } catch(error) {
+      const isError = true
+      showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
+    }
+  }
+
   const logout = () => {
     window.localStorage.removeItem('blogApplication.loggedInUserName')
     window.localStorage.removeItem('blogApplication.accessToken')
@@ -79,7 +89,7 @@ const App = () => {
         <CreateBlogForm onSubmit={ onCreateBlog } />
         <br/>
         { blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} onClickLike={ () => onLikeBlog(blog) }/>
         ) }
       </div>)
   } else {

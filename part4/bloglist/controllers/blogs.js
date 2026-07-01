@@ -66,7 +66,7 @@ blogRouter.delete('/blogs/:id', userExtractor, async (request, response) => {
   response.status(204).end()
 })
 
-blogRouter.put('/blogs/:id', requestValidator.checkHasBody, async (request, response) => {
+blogRouter.put('/blogs/:id', requestValidator.checkHasBody, userExtractor, async (request, response) => {
   const blogToUpdate = await Blog.findById(request.params.id)
 
   // For now, assuming that only the like counts get updated
