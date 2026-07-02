@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from 'react'
 
 const Blog = ({ blog, onClickLike, isDeletable, onClickDelete }) => {
   const [isCollapsed, setCollapsed] = useState(true)
@@ -22,10 +22,10 @@ const Blog = ({ blog, onClickLike, isDeletable, onClickDelete }) => {
           {blog.url}<br/>
           likes {blog.likes} <button onClick={ onClickLike }>like</button><br/>
           {blog.user.name}<br/>
-          {isDeletable && <button onClick={ onClickDelete }>remove</button>} 
+          {isDeletable && <button onClick={ onClickDelete }>remove</button>}
         </div>
       )}
-    </div>  
+    </div>
   )
 }
 

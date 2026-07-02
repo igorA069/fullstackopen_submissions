@@ -6,7 +6,7 @@ import CreateBlogForm from './components/CreateBlogForm'
 import Notification from './components/Notification'
 
 import blogService from './services/blogs'
-import login from "./services/login"
+import login from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -29,36 +29,36 @@ const App = () => {
   const onLogin = async (username, password) => {
     // attempt to login
     try {
-        const accessToken = await login(username, password)
-        // if successfull, store the token
-        setAccessToken(accessToken)
-        setUsername(username)
+      const accessToken = await login(username, password)
+      // if successfull, store the token
+      setAccessToken(accessToken)
+      setUsername(username)
 
-        window.localStorage.setItem('blogApplication.loggedInUserName', username)
-        window.localStorage.setItem('blogApplication.accessToken', accessToken)
+      window.localStorage.setItem('blogApplication.loggedInUserName', username)
+      window.localStorage.setItem('blogApplication.accessToken', accessToken)
     } catch (error) {
-        const isError = true
-        showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
+      const isError = true
+      showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
     }
   }
 
   const onCreateBlog = async (title, author, url) => {
     try {
       const response = await blogService.add(title, author, url, accessToken)
-      const newBlog = { title, author, url, user: {username}, id: response.data.id }
+      const newBlog = { title, author, url, user: { username }, id: response.data.id }
       setBlogs([...blogs, newBlog])
       const isError = false
       showNotification(`a new blog "${title}" by ${author} added.`, isError)
     } catch (error) {
-        const isError = true
-        showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
+      const isError = true
+      showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
     }
   }
 
   const onLikeBlog = async (blog) => {
     try {
       await blogService.like(blog, accessToken)
-      setBlogs(blogs.map(iterBlog => ((iterBlog.id === blog.id) ? {...iterBlog, likes: iterBlog.likes + 1} : iterBlog)))
+      setBlogs(blogs.map(iterBlog => ((iterBlog.id === blog.id) ? { ...iterBlog, likes: iterBlog.likes + 1 } : iterBlog)))
     } catch(error) {
       const isError = true
       showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
@@ -75,7 +75,7 @@ const App = () => {
     } catch (error) {
       const isError = true
       showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
-    } 
+    }
   }
 
   const logout = () => {
@@ -104,14 +104,14 @@ const App = () => {
         <CreateBlogForm onSubmit={ onCreateBlog } />
         <br/>
         { sortedBlogs.map(blog => (
-            <Blog 
-              key={blog.id} 
-              blog={blog} 
-              onClickLike={ () => onLikeBlog(blog) } 
-              isDeletable={ blog.user.username === username }
-              onClickDelete={ () => onDeleteBlog(blog) }
-            />
-          )
+          <Blog
+            key={blog.id}
+            blog={blog}
+            onClickLike={ () => onLikeBlog(blog) }
+            isDeletable={ blog.user.username === username }
+            onClickDelete={ () => onDeleteBlog(blog) }
+          />
+        )
         ) }
       </div>)
   } else {
