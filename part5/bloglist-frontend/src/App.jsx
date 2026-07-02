@@ -81,6 +81,7 @@ const App = () => {
 
   if (username) {
     // user is logged in
+    const sortedBlogs = [...blogs].sort((blog1, blog2) => (blog2.likes - blog1.likes))
     return (
       <div>
         <h2>blogs</h2>
@@ -88,7 +89,7 @@ const App = () => {
         <p>{username} logged in<button onClick={logout}>logout</button></p>
         <CreateBlogForm onSubmit={ onCreateBlog } />
         <br/>
-        { blogs.map(blog =>
+        { sortedBlogs.map(blog =>
           <Blog key={blog.id} blog={blog} onClickLike={ () => onLikeBlog(blog) }/>
         ) }
       </div>)
