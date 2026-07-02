@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-const Blog = ({ blog, onClickLike }) => {
+const Blog = ({ blog, onClickLike, isDeletable, onClickDelete }) => {
   const [isCollapsed, setCollapsed] = useState(true)
 
   const style = {
@@ -21,7 +21,8 @@ const Blog = ({ blog, onClickLike }) => {
           <br/>
           {blog.url}<br/>
           likes {blog.likes} <button onClick={ onClickLike }>like</button><br/>
-          {blog.user.name}
+          {blog.user.name}<br/>
+          {isDeletable && <button onClick={ onClickDelete }>remove</button>} 
         </div>
       )}
     </div>  

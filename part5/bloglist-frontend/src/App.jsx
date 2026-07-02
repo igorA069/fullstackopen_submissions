@@ -44,8 +44,9 @@ const App = () => {
 
   const onCreateBlog = async (title, author, url) => {
     try {
-      await blogService.add(title, author, url, accessToken)
-      setBlogs([...blogs, { title, author, url }])
+      const response = await blogService.add(title, author, url, accessToken)
+      const newBlog = { title, author, url, user: {username}, id: response.data.id }
+      setBlogs([...blogs, newBlog])
       const isError = false
       showNotification(`a new blog "${title}" by ${author} added.`, isError)
     } catch (error) {
@@ -62,6 +63,19 @@ const App = () => {
       const isError = true
       showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
     }
+  }
+
+  const onDeleteBlog = async (blog) => {
+    if (!window.confirm(`Remove blog "${blog.title}" by ${blog.author} ?`)) {
+      return
+    }
+    try {
+      await blogService.remove(blog, accessToken)
+      setBlogs(blogs.filter(iterBlog => iterBlog.id !== blog.id))
+    } catch (error) {
+      const isError = true
+      showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
+    } 
   }
 
   const logout = () => {
@@ -89,8 +103,15 @@ const App = () => {
         <p>{username} logged in<button onClick={logout}>logout</button></p>
         <CreateBlogForm onSubmit={ onCreateBlog } />
         <br/>
-        { sortedBlogs.map(blog =>
-          <Blog key={blog.id} blog={blog} onClickLike={ () => onLikeBlog(blog) }/>
+        { sortedBlogs.map(blog => (
+            <Blog 
+              key={blog.id} 
+              blog={blog} 
+              onClickLike={ () => onLikeBlog(blog) } 
+              isDeletable={ blog.user.username === username }
+              onClickDelete={ () => onDeleteBlog(blog) }
+            />
+          )
         ) }
       </div>)
   } else {
