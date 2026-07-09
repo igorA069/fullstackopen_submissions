@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { test, expect } from 'vitest'
+import { test, expect, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 
 import Blog from './Blog'
@@ -46,4 +46,20 @@ test('url and likes become visible when the view button is clicked', async () =>
 
   element = screen.queryByText(blog.likes.toString(), { exact:false })
   expect(element).toBeVisible()
+})
+
+test('clicking like button 2x triggers the corresponding even handler 2x', async () => {
+  const onClickLike = vi.fn()
+
+  render(<Blog blog={ blog } onClickLike={ onClickLike }/>)
+  const user = userEvent.setup()
+
+  // toggle view to make like button visible
+  const viewButton = screen.getByText('view')
+  await user.click(viewButton)
+
+  const likeButton = screen.getByText('like')
+  await user.click(likeButton)
+  await user.click(likeButton)
+  expect(onClickLike.mock.calls).toHaveLength(2)
 })
