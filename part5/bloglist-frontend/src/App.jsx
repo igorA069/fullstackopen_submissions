@@ -45,7 +45,7 @@ const App = () => {
   const onCreateBlog = async (title, author, url) => {
     try {
       const response = await blogService.add(title, author, url, accessToken)
-      const newBlog = { title, author, url, user: { username }, id: response.data.id }
+      const newBlog = { title, author, url, likes: 0, user: { username }, id: response.data.id }
       setBlogs([...blogs, newBlog])
       const isError = false
       showNotification(`a new blog "${title}" by ${author} added.`, isError)
