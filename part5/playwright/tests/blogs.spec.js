@@ -1,5 +1,5 @@
 const { test, describe, expect, beforeEach } = require('@playwright/test')
-const { login, createBlog } = require('./helper')
+const { login, createBlog, likeBlog } = require('./helper')
 
 describe('Blog app', () => {
     beforeEach(async ({ page, request }) => {
@@ -55,11 +55,8 @@ describe('Blog app', () => {
 
         test('Blog can be liked', async ({ page }) => {
            await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
-
+           await likeBlog(page, 'NewTitle', 'NewAuthor', true)
            const blogElement = page.getByText('NewTitle NewAuthor')
-           await blogElement.getByRole('button', { name:'view' }).click()
-           await blogElement.getByRole('button', { name:'like' }).click()
-
            await expect(blogElement.getByText('likes 1')).toBeVisible()
         })
 
@@ -75,6 +72,41 @@ describe('Blog app', () => {
            await blogElement.getByRole('button', { name:'remove' }).click()
 
            await expect(blogElement).not.toBeVisible()
+        })
+
+        test('Blogs are ordered by the likes count, in descending order', async ({ page }) => {
+            // create 3 blogs
+            await createBlog(page, 'NewTitle1', 'NewAuthor1', 'NewUrl1')
+            await createBlog(page, 'NewTitle2', 'NewAuthor2', 'NewUrl2')
+            await createBlog(page, 'NewTitle3', 'NewAuthor3', 'NewUrl3')
+
+            // desired like count:
+            const blog1likes = 2
+            const blog2likes = 3
+            const blog3likes = 1
+            // resulting expected order:
+            const expectedMostLikedTitle = 'NewTitle2'
+            const expected2ndMostLikedTitle = 'NewTitle1'
+            const expected3rdMostLikedTitle = 'NewTitle3'
+            // click corresp. like button to achieve the desired resp. like count
+            for (let i = 0; i < blog1likes; i++) {
+                await likeBlog(page, 'NewTitle1', 'NewAuthor1', i === 0)
+            }
+            for (let i = 0; i < blog2likes; i++) {
+                await likeBlog(page, 'NewTitle2', 'NewAuthor2', i === 0)
+            }
+            for (let i = 0; i < blog3likes; i++) {
+                await likeBlog(page, 'NewTitle3', 'NewAuthor3', i === 0)
+            }
+
+            // locate 1st, 2nd and 3rd blog on page and check if they have the resp. expected title
+            const actualHighestBlog     = page.getByRole('button', { name: 'hide' }).nth(0).locator('..')
+            const actual2ndHighestBlog  = page.getByRole('button', { name: 'hide' }).nth(1).locator('..')
+            const actual3rdHighestBlog  = page.getByRole('button', { name: 'hide' }).nth(2).locator('..')
+
+            await expect(actualHighestBlog.     getByText(expectedMostLikedTitle)).toBeVisible()
+            await expect(actual2ndHighestBlog.  getByText(expected2ndMostLikedTitle)).toBeVisible()
+            await expect(actual3rdHighestBlog.  getByText(expected3rdMostLikedTitle)).toBeVisible()
         })
     })
 

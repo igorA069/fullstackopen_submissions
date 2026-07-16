@@ -13,4 +13,15 @@ const createBlog = async (page, title, author, url) => {
     await page.getByRole('button', { name: 'create' }).click()
 }
 
-module.exports = { login, createBlog }
+const likeBlog = async (page, title, author, isCollapsed) => {
+    const blogElement = page.getByText(`${title} ${author}`)
+    if (isCollapsed) {
+        // expand first:
+        const viewButton = blogElement.getByRole('button', { name:'view' })
+        await viewButton.click()
+    } 
+    const likeButton = blogElement.getByRole('button', { name:'like' })
+    await likeButton.click()
+}
+
+module.exports = { login, createBlog, likeBlog }
