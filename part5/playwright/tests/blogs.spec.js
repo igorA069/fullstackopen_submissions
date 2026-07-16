@@ -57,10 +57,24 @@ describe('Blog app', () => {
            await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
 
            const blogElement = page.getByText('NewTitle NewAuthor')
-           await blogElement.getByRole('button', {name:'view'}).click()
-           await blogElement.getByRole('button', {name:'like'}).click()
+           await blogElement.getByRole('button', { name:'view' }).click()
+           await blogElement.getByRole('button', { name:'like' }).click()
 
            await expect(blogElement.getByText('likes 1')).toBeVisible()
+        })
+
+        test('Blog can be removed', async ({ page }) => {
+           await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
+
+           const blogElement = page.getByText('NewTitle NewAuthor')
+           await blogElement.getByRole('button', { name:'view' }).click()
+           
+           // Register a dialog handler that shall accept the dialog, before clicking delete
+           page.on('dialog', dialog => dialog.accept())
+           // press delete, which shall bring up the confirmation dialog
+           await blogElement.getByRole('button', { name:'remove' }).click()
+
+           await expect(blogElement).not.toBeVisible()
         })
 
         const createBlog = async (page, title, author, url) => {
