@@ -1,5 +1,5 @@
 const { test, describe, expect, beforeEach } = require('@playwright/test')
-const { login } = require('./helper')
+const { login, createBlog } = require('./helper')
 
 describe('Blog app', () => {
     beforeEach(async ({ page, request }) => {
@@ -76,14 +76,29 @@ describe('Blog app', () => {
 
            await expect(blogElement).not.toBeVisible()
         })
+    })
 
-        const createBlog = async (page, title, author, url) => {
-            await page.getByRole('button', { name: 'create new blog' }).click()
+    test('Only the user who added the blog sees the blog delete button', async ({ page, request }) => {
+        // login as user1
+        await login(page, 'user1', 'user1password')
+        // create blog
+        await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
+        // logout
+        page.getByRole('button', { name: 'logout' }).click()
 
-            await page.getByLabel('title').fill(title)
-            await page.getByLabel('author').fill(author)
-            await page.getByLabel('url').fill(url)
-            await page.getByRole('button', { name: 'create' }).click()
-        }
+        // create second user in DB
+        await request.post('http://localhost:3003/api/users', { 
+            data: {
+                username: 'user2',
+                name: 'user2name',
+                password: 'user2password'
+            }
+        })
+        // login as user2
+        await login(page, 'user2', 'user2password')
+        // blog of user1 shall be visible, but the delete button shall not
+        const blogElement = page.getByText('NewTitle NewAuthor')
+        await blogElement.getByRole('button', { name: 'view' }).click()
+        await expect(blogElement.getByRole('button', { name: 'remove' })).not.toBeVisible()
     })
 })
