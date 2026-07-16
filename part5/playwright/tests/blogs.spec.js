@@ -47,14 +47,29 @@ describe('Blog app', () => {
         test('Logged in user can create a blog', async ({ page }) => {
             const showCreateFormButton = page.getByRole('button', { name: 'create new blog' })
             await expect(page.getByRole('button', { name: 'create new blog' })).toBeVisible()
-            await showCreateFormButton.click()
-
-            await page.getByLabel('title').fill('NewTitle')
-            await page.getByLabel('author').fill('NewAuthor')
-            await page.getByLabel('url').fill('NewAuthoNewUrl')
-            await page.getByRole('button', { name: 'create' }).click()
+            
+            await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
 
             await expect(page.getByText('NewTitle NewAuthor')).toBeVisible()
         })
+
+        test('Blog can be liked', async ({ page }) => {
+           await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
+
+           const blogElement = page.getByText('NewTitle NewAuthor')
+           await blogElement.getByRole('button', {name:'view'}).click()
+           await blogElement.getByRole('button', {name:'like'}).click()
+
+           await expect(blogElement.getByText('likes 1')).toBeVisible()
+        })
+
+        const createBlog = async (page, title, author, url) => {
+            await page.getByRole('button', { name: 'create new blog' }).click()
+
+            await page.getByLabel('title').fill(title)
+            await page.getByLabel('author').fill(author)
+            await page.getByLabel('url').fill(url)
+            await page.getByRole('button', { name: 'create' }).click()
+        }
     })
 })
