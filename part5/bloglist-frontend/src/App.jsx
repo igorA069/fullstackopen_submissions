@@ -57,6 +57,8 @@ const App = () => {
       setBlogs([...blogs, newBlog])
       const isError = false
       showNotification(`a new blog "${title}" by ${author} added.`, isError)
+
+      navigate('/')
     } catch (error) {
       const isError = true
       showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
@@ -80,6 +82,8 @@ const App = () => {
     try {
       await blogService.remove(blog, accessToken)
       setBlogs(blogs.filter(iterBlog => iterBlog.id !== blog.id))
+
+      navigate('/')
     } catch (error) {
       const isError = true
       showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
@@ -111,6 +115,9 @@ const App = () => {
   return (
     <div>
       <Link style={padding} to='/'>blogs</Link>
+      { username &&
+        <Link style={padding} to='/create'>new blog</Link>
+      }
       { username
         ? <button onClick={ logout }>logout</button>
         : <Link to='/login'>login</Link> }
@@ -134,6 +141,13 @@ const App = () => {
                   isDeletable={ blog.user.username === username }
                   onClickDelete={ () => onDeleteBlog(blog) }
                 />}>
+        </Route>
+        <Route path='/create' element={ 
+          <>
+            <Notification text={notification} isError={isNotificationError}/>
+            <CreateBlogForm onSubmit={ onCreateBlog } /> 
+          </>
+          }>
         </Route>
       </Routes>
     </div>
