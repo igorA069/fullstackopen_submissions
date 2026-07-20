@@ -101,36 +101,32 @@ const App = () => {
     }, 3000)
   }
 
-    const match = useMatch('/blogs/:id')
-    const blog = match ? blogs.find(blog => blog.id === match.params.id) : null
+  const match = useMatch('/blogs/:id')
+  const blog = match ? blogs.find(blog => blog.id === match.params.id) : null
 
   const padding = {
-      padding: '5px'
-    }
+    padding: '5px'
+  }
 
-    return (
-        <div>
-          <Link style={padding} to='/'>blogs</Link>
-          { username
-            ? <button onClick={ logout }>logout</button> 
-            : <Link to='/login'>login</Link> }
+  return (
+    <div>
+      <Link style={padding} to='/'>blogs</Link>
+      { username
+        ? <button onClick={ logout }>logout</button>
+        : <Link to='/login'>login</Link> }
 
-          <Routes>
-              <Route path='/' element={ 
-                <Blogs 
-                  blogs={blogs} 
-                  onLikeBlog={onLikeBlog} 
-                  onDeleteBlog={onDeleteBlog} 
-                  username={username}/> 
-                }/>
-              <Route path='/login' element={ 
-                <>
-                  <Notification text={notification} isError={isNotificationError}/>
-                  <LoginForm onSubmit={ onLogin }/> 
-                </>
-              }/>
-              <Route path='/blogs/:id' element={
-                blog &&
+      <Routes>
+        <Route path='/' element={
+          <Blogs blogs={blogs} />
+        }/>
+        <Route path='/login' element={
+          <>
+            <Notification text={notification} isError={isNotificationError}/>
+            <LoginForm onSubmit={ onLogin }/>
+          </>
+        }/>
+        <Route path='/blogs/:id' element={
+          blog &&
                 <Blog
                   blog={blog}
                   isLikeable={ blog.user.username === username }
@@ -138,10 +134,10 @@ const App = () => {
                   isDeletable={ blog.user.username === username }
                   onClickDelete={ () => onDeleteBlog(blog) }
                 />}>
-              </Route>
-          </Routes>
-        </div>
-    )
+        </Route>
+      </Routes>
+    </div>
+  )
 }
 
 export default App
