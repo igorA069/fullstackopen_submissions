@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 
-import Blog from './components/Blog'
+import { useNavigate } from 'react-router'
+import { Routes, Route, Link } from 'react-router'
+
+import Blogs from './components/Blogs'
 import LoginForm from './components/LoginForm'
 import CreateBlogForm from './components/CreateBlogForm'
 import Notification from './components/Notification'
@@ -26,6 +29,8 @@ const App = () => {
     setAccessToken(window.localStorage.getItem('blogApplication.accessToken'))
   }, [])
 
+  const navigate = useNavigate()
+
   const onLogin = async (username, password) => {
     // attempt to login
     try {
@@ -36,6 +41,8 @@ const App = () => {
 
       window.localStorage.setItem('blogApplication.loggedInUserName', username)
       window.localStorage.setItem('blogApplication.accessToken', accessToken)
+
+      navigate('/')
     } catch (error) {
       const isError = true
       showNotification(`Status ${error.response.status}: ${JSON.stringify(error.response.data)}`, isError)
@@ -92,36 +99,34 @@ const App = () => {
       setNotification('')
     }, 3000)
   }
+    const padding = {
+      padding: '5px'
+    }
 
-  if (username) {
-    // user is logged in
-    const sortedBlogs = [...blogs].sort((blog1, blog2) => (blog2.likes - blog1.likes))
     return (
-      <div>
-        <h2>blogs</h2>
-        <Notification text={notification} isError={isNotificationError}/>
-        <p>{username} logged in<button onClick={logout}>logout</button></p>
-        <CreateBlogForm onSubmit={ onCreateBlog } />
-        <br/>
-        { sortedBlogs.map(blog => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            onClickLike={ () => onLikeBlog(blog) }
-            isDeletable={ blog.user.username === username }
-            onClickDelete={ () => onDeleteBlog(blog) }
-          />
-        )
-        ) }
-      </div>)
-  } else {
-    // no user logged in
-    return (
-      <div>
-        <Notification text={notification} isError={isNotificationError}/>
-        <LoginForm onSubmit={ onLogin } />
-      </div>)
-  }
+        <div>
+          <Link style={padding} to='/'>blogs</Link>
+          { username
+            ? <button onClick={ logout }>logout</button> 
+            : <Link to='/login'>login</Link> }
+
+          <Routes>
+              <Route path='/' element={ 
+                <Blogs 
+                  blogs={blogs} 
+                  onLikeBlog={onLikeBlog} 
+                  onDeleteBlog={onDeleteBlog} 
+                  username={username}/> 
+                }/>
+              <Route path='/login' element={ 
+                <>
+                  <Notification text={notification} isError={isNotificationError}/>
+                  <LoginForm onSubmit={ onLogin }/> 
+                </>
+              }/>
+          </Routes>
+        </div>
+    )
 }
 
 export default App
