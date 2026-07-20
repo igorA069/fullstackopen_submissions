@@ -1,19 +1,17 @@
-import Blog from "./Blog"
+import { Link } from "react-router"
 
 const Blogs = ({ blogs, onLikeBlog, onDeleteBlog, username }) => {
     const sortedBlogs = [...blogs].sort((blog1, blog2) => (blog2.likes - blog1.likes))
     return (
         <div>
             <h2>blogs</h2>
-            { sortedBlogs.map(blog => (
-                <Blog
-                    key={blog.id}
-                    blog={blog}
-                    onClickLike={ () => onLikeBlog(blog) }
-                    isDeletable={ blog.user.username === username }
-                    onClickDelete={ () => onDeleteBlog(blog) }
-                />
-            )) }
+            <ul>
+                { sortedBlogs.map(blog => (
+                    <li key={blog.id}>
+                        <Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link>
+                    </li>
+                )) }
+            </ul>
         </div>)
 }
 

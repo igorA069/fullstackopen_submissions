@@ -1,30 +1,12 @@
-import { useState } from 'react'
-
-const Blog = ({ blog, onClickLike, isDeletable, onClickDelete }) => {
-  const [isCollapsed, setCollapsed] = useState(true)
-
-  const style = {
-    borderStyle: 'none',
-    borderRadius: '5px',
-    background: 'lightgrey',
-    padding: '5px',
-    margin: '5px'
-  }
-
-  const toggleCollapsed = () => setCollapsed(!isCollapsed)
+const Blog = ({ blog, isLikeable, onClickLike, isDeletable, onClickDelete }) => {
 
   return (
-    <div style={style}>
-      {blog.title} {blog.author} <button onClick={ toggleCollapsed }>{ isCollapsed ? 'view' : 'hide' }</button>
-      {!isCollapsed && (
-        <div>
-          <br/>
-          {blog.url}<br/>
-          likes {blog.likes} <button onClick={ onClickLike }>like</button><br/>
-          {blog.user.name}<br/>
-          {isDeletable && <button onClick={ onClickDelete }>remove</button>}
-        </div>
-      )}
+    <div>
+      <h2>{blog.author}: {blog.title}</h2>
+      <a href={blog.url}>{blog.url}</a><br/>
+      likes {blog.likes} { isLikeable && <button onClick={ onClickLike }>like</button> }<br/>
+      Added by {blog.user.name}<br/>
+      {isDeletable && <button onClick={ onClickDelete }>remove</button>}
     </div>
   )
 }

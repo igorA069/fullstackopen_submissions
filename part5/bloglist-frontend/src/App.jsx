@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 
-import { useNavigate } from 'react-router'
+import { useNavigate, useMatch } from 'react-router'
 import { Routes, Route, Link } from 'react-router'
 
 import Blogs from './components/Blogs'
+import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import CreateBlogForm from './components/CreateBlogForm'
 import Notification from './components/Notification'
@@ -99,7 +100,11 @@ const App = () => {
       setNotification('')
     }, 3000)
   }
-    const padding = {
+
+    const match = useMatch('/blogs/:id')
+    const blog = match ? blogs.find(blog => blog.id === match.params.id) : null
+
+  const padding = {
       padding: '5px'
     }
 
@@ -124,6 +129,16 @@ const App = () => {
                   <LoginForm onSubmit={ onLogin }/> 
                 </>
               }/>
+              <Route path='/blogs/:id' element={
+                blog &&
+                <Blog
+                  blog={blog}
+                  isLikeable={ blog.user.username === username }
+                  onClickLike={ () => onLikeBlog(blog) }
+                  isDeletable={ blog.user.username === username }
+                  onClickDelete={ () => onDeleteBlog(blog) }
+                />}>
+              </Route>
           </Routes>
         </div>
     )
