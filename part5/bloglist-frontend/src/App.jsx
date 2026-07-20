@@ -136,7 +136,7 @@ const App = () => {
           blog &&
                 <Blog
                   blog={blog}
-                  isLikeable={ blog.user.username === username }
+                  isLikeable={ username != null }
                   onClickLike={ () => onLikeBlog(blog) }
                   isDeletable={ blog.user.username === username }
                   onClickDelete={ () => onDeleteBlog(blog) }
