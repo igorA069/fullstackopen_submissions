@@ -17,6 +17,7 @@ describe('Blog app', () => {
     })
 
     test('Login form is shown', async ({ page }) => {
+        await page.getByRole('link', { name: 'login' }).click()
         await expect(page.getByText('log in to application')).toBeVisible()
         await expect(page.getByRole('textbox', { name: 'username' })).toBeVisible()
         await expect(page.getByRole('textbox', { name: 'password' })).toBeVisible()
@@ -25,17 +26,17 @@ describe('Blog app', () => {
     describe('Login', () => {
         test('Success with correct credentials', async ({ page }) => {
             await login(page, 'user1', 'user1password')
-            await expect(page.getByText('user1 logged in')).toBeVisible()
+            await expect(page.getByRole('button', { name: 'logout' })).toBeVisible()
         })
 
         test('Failure with existing user but wrong password', async ({ page }) => {
             await login(page, 'user1', '1234')
-            await expect(page.getByText('user1 logged in')).not.toBeVisible()
+            await expect(page.getByRole('button', { name: 'logout' })).not.toBeVisible()
         })
 
         test('Failure with unknown user', async ({ page }) => {
             await login(page, 'unknown', '1234')
-            await expect(page.getByText('user1 logged in')).not.toBeVisible()
+            await expect(page.getByRole('button', { name: 'logout' })).not.toBeVisible()
         })
     })
 
@@ -45,31 +46,29 @@ describe('Blog app', () => {
         })
 
         test('Logged in user can create a blog', async ({ page }) => {
-            const showCreateFormButton = page.getByRole('button', { name: 'create new blog' })
-            await expect(page.getByRole('button', { name: 'create new blog' })).toBeVisible()
+            await expect(page.getByRole('link', { name: 'new blog' })).toBeVisible()
             
             await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
 
-            await expect(page.getByText('NewTitle NewAuthor')).toBeVisible()
+            await expect(page.getByText('NewTitle by NewAuthor')).toBeVisible()
         })
 
         test('Blog can be liked', async ({ page }) => {
            await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
-           await likeBlog(page, 'NewTitle', 'NewAuthor', true)
-           const blogElement = page.getByText('NewTitle NewAuthor')
-           await expect(blogElement.getByText('likes 1')).toBeVisible()
+           await likeBlog(page, 'NewTitle', 'NewAuthor')
+           await expect(page.getByText('likes 1')).toBeVisible()
         })
 
         test('Blog can be removed', async ({ page }) => {
            await createBlog(page, 'NewTitle', 'NewAuthor', 'NewUrl')
 
-           const blogElement = page.getByText('NewTitle NewAuthor')
-           await blogElement.getByRole('button', { name:'view' }).click()
+           const blogElement = page.getByText('NewTitle by NewAuthor')
+           await blogElement.click()
            
            // Register a dialog handler that shall accept the dialog, before clicking delete
            page.on('dialog', dialog => dialog.accept())
            // press delete, which shall bring up the confirmation dialog
-           await blogElement.getByRole('button', { name:'remove' }).click()
+           await page.getByRole('button', { name:'remove' }).click()
 
            await expect(blogElement).not.toBeVisible()
         })
@@ -90,19 +89,22 @@ describe('Blog app', () => {
             const expected3rdMostLikedTitle = 'NewTitle3'
             // click corresp. like button to achieve the desired resp. like count
             for (let i = 0; i < blog1likes; i++) {
-                await likeBlog(page, 'NewTitle1', 'NewAuthor1', i === 0)
+                await likeBlog(page, 'NewTitle1', 'NewAuthor1')
+                await page.getByRole('link', { name: 'blogs' }).click()
             }
             for (let i = 0; i < blog2likes; i++) {
-                await likeBlog(page, 'NewTitle2', 'NewAuthor2', i === 0)
+                await likeBlog(page, 'NewTitle2', 'NewAuthor2')
+                await page.getByRole('link', { name: 'blogs' }).click()
             }
             for (let i = 0; i < blog3likes; i++) {
-                await likeBlog(page, 'NewTitle3', 'NewAuthor3', i === 0)
+                await likeBlog(page, 'NewTitle3', 'NewAuthor3')
+                await page.getByRole('link', { name: 'blogs' }).click()
             }
 
             // locate 1st, 2nd and 3rd blog on page and check if they have the resp. expected title
-            const actualHighestBlog     = page.getByRole('button', { name: 'hide' }).nth(0).locator('..')
-            const actual2ndHighestBlog  = page.getByRole('button', { name: 'hide' }).nth(1).locator('..')
-            const actual3rdHighestBlog  = page.getByRole('button', { name: 'hide' }).nth(2).locator('..')
+            const actualHighestBlog     = page.getByRole('link', { name: ' by ' }).nth(0)
+            const actual2ndHighestBlog  = page.getByRole('link', { name: ' by ' }).nth(1)
+            const actual3rdHighestBlog  = page.getByRole('link', { name: ' by ' }).nth(2)
 
             await expect(actualHighestBlog.     getByText(expectedMostLikedTitle)).toBeVisible()
             await expect(actual2ndHighestBlog.  getByText(expected2ndMostLikedTitle)).toBeVisible()
@@ -129,8 +131,8 @@ describe('Blog app', () => {
         // login as user2
         await login(page, 'user2', 'user2password')
         // blog of user1 shall be visible, but the delete button shall not
-        const blogElement = page.getByText('NewTitle NewAuthor')
-        await blogElement.getByRole('button', { name: 'view' }).click()
+        const blogElement = page.getByText('NewTitle by NewAuthor')
+        await blogElement.click()
         await expect(blogElement.getByRole('button', { name: 'remove' })).not.toBeVisible()
     })
 })
