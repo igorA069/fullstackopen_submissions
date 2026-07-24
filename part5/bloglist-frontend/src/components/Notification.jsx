@@ -1,16 +1,7 @@
+import { Alert } from "@mui/material"
 const Notification = (props) => {
-  const textStyle = {
-    color: props.isError ? 'red' : 'green',
-    background: 'lightgrey',
-    borderStyle: 'solid',
-    borderRadius: '5px',
-    padding: '5px'
-  }
   if (props.text) {
-    return(
-      <div style={textStyle}>
-        {props.text}
-      </div>)
+    return <Alert severity={ props.isError ? 'error' : 'success'} sx={{ mt: 2 }}>{ props.text }</Alert>
   } else {
     return null
   }

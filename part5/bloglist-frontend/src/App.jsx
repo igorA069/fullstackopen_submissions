@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useMatch } from 'react-router'
 import { Routes, Route, Link } from 'react-router'
 
+import { AppBar, Toolbar, Button, Typography } from '@mui/material'
+
 import Blogs from './components/Blogs'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -95,6 +97,8 @@ const App = () => {
     window.localStorage.removeItem('blogApplication.accessToken')
     setUsername(null)
     setAccessToken(null)
+
+    navigate('/')
   }
 
   const showNotification = (message, isError) => {
@@ -114,17 +118,27 @@ const App = () => {
 
   return (
     <div>
-      <Link style={padding} to='/'>blogs</Link>
-      { username &&
-        <Link style={padding} to='/create'>new blog</Link>
-      }
-      { username
-        ? <button onClick={ logout }>logout</button>
-        : <Link to='/login'>login</Link> }
+      <AppBar position='static'>
+        <Toolbar>
+          <Typography variant='h6' component="div" sx={{ flexGrow: 1 }}>
+            Blog App
+          </Typography>
+          <Button color='inherit' component={ Link } to='/'>blogs</Button>
+          { username &&
+            <Button color='inherit' component={ Link } to='/create'>new blog</Button>
+          }
+          { username
+            ? <Button color='inherit' onClick={ logout }>logout</Button>
+            : <Button color='inherit' component={ Link } to='/login'>login</Button> }
+        </Toolbar>
 
+      </AppBar>
       <Routes>
         <Route path='/' element={
-          <Blogs blogs={blogs} />
+          <>
+            <Notification text={notification} isError={isNotificationError}/>
+            <Blogs blogs={blogs} />
+          </>
         }/>
         <Route path='/login' element={
           <>
