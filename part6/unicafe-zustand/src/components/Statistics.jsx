@@ -1,4 +1,10 @@
-const Statistics = ({counterGood, counterNeutral, counterBad}) => {
+import { useCounterGood, useCounterNeutral, useCounterBad } from '../store'
+
+const Statistics = () => {
+  const counterGood = useCounterGood()
+  const counterNeutral = useCounterNeutral()
+  const counterBad = useCounterBad()
+
   const all = counterGood + counterNeutral + counterBad
   const average = all ? ((counterGood - counterBad) / all) : 0
   const positive = all ? (counterGood / all) : 0
