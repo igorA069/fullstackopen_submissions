@@ -7,6 +7,11 @@ const App = () => {
 
   const vote = id => anecdoteActions.vote(id)
 
+  const onCreate = event => {
+    event.preventDefault()
+    anecdoteActions.create(event.target.newAnecdote.value)
+  }
+
   return (
     <div>
       <h2>Anecdotes</h2>
@@ -20,11 +25,11 @@ const App = () => {
         </div>
       ))}
       <h2>create new</h2>
-      <form>
+      <form onSubmit={onCreate}>
         <div>
-          <input />
+          <input name="newAnecdote"/>
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
       </form>
     </div>
   )
