@@ -22,3 +22,18 @@ export const add = async (anecdote) => {
   }
   return await response.json()
 }
+
+export const update = async (id, anecdote) => {
+  const options = {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'applications/json'
+    },
+    body: JSON.stringify(anecdote)
+  }
+  const response = await fetch(`${baseUrl}/${id}`, options)
+  if (!response.ok) {
+    throw new Error('Failed to update')
+  }
+  return await response.json()
+}

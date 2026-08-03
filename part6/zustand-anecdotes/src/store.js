@@ -1,6 +1,6 @@
 
 import { create } from 'zustand'
-import { getAll, add } from './services/anecdotes'
+import { getAll, add, update } from './services/anecdotes'
 
 const getId = () => (100000 * Math.random()).toFixed(0)
 
@@ -13,10 +13,13 @@ const asObject = anecdote => ({
 const useAnecdoteStore = create((set) => ({
   anecdotes: [],
   actions: {
-    vote: id => set(state => ({ 
-      anecdotes: state.anecdotes.map(
-        anecdote => anecdote.id === id ? {...anecdote, votes: anecdote.votes + 1} : anecdote
-      )})),
+    vote: async (id) => {
+      const anecdote = useAnecdoteStore.getState().anecdotes.find(anecdote => anecdote.id === id)
+      const updatedAnecdote = await update(id, {...anecdote, votes: anecdote.votes + 1})
+      set(state => ({ 
+        anecdotes: state.anecdotes.map(anecdote => anecdote.id === id ? updatedAnecdote : anecdote
+      )}))
+    },
 
     create: async (text) => {
       const newAnecdote = await add(asObject(text))
