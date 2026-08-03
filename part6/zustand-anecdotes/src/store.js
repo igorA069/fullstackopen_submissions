@@ -25,7 +25,8 @@ const useAnecdoteStore = create((set) => ({
       const newAnecdote = await add(asObject(text))
       set(state => ({
         anecdotes: state.anecdotes.concat(newAnecdote)
-      }))},
+      }))
+    },
 
     initialize: async () => {
       const newAnecdotes = await getAll()
