@@ -1,6 +1,6 @@
 
 import { create } from 'zustand'
-import { getAll, add, update } from './services/anecdotes'
+import { getAll, add, update, remove } from './services/anecdotes'
 
 const getId = () => (100000 * Math.random()).toFixed(0)
 
@@ -28,10 +28,17 @@ const useAnecdoteStore = create((set) => ({
       }))
     },
 
+    remove: async (id) => {
+      await remove(id)
+      set(state => ({
+        anecdotes: state.anecdotes.filter(anecdote => anecdote.id !== id)
+      }))
+    },
+    
     initialize: async () => {
       const newAnecdotes = await getAll()
       set(() => ({ anecdotes: newAnecdotes }))
-    }
+    },
   }
 }))
 

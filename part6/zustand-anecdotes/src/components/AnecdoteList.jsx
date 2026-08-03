@@ -8,12 +8,17 @@ export const AnecdoteList = () => {
   const filteredAnecdotes = filter ? anecdotes.filter(anecdote => anecdote.content.includes(filter)) : anecdotes
   const sortedAnecdotes = filteredAnecdotes.toSorted((a, b) => (b.votes - a.votes))
 
-  const { vote } = useAnecdoteActions()
+  const { vote, remove } = useAnecdoteActions()
   const { showNotification } = useNotificationActions()
 
   const onVote = (anecdote) => {
     vote(anecdote.id)
     showNotification(`You voted '${anecdote.content}'`)
+  }
+
+  const onRemove = (anecdote) => {
+    remove(anecdote.id)
+    showNotification(`You removed '${anecdote.content}'`)
   }
 
   return (
@@ -23,6 +28,7 @@ export const AnecdoteList = () => {
         <div>
           has {anecdote.votes}
           <button onClick={() => onVote(anecdote)}>vote</button>
+          {anecdote.votes === 0 && <button onClick={() => onRemove(anecdote)}>delete</button>}
         </div>
       </div>
     )))}
