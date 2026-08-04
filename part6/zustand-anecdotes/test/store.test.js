@@ -104,9 +104,9 @@ it('voting increases the number of votes', async () => {
   getAll.mockResolvedValue(initialAnecdotes)
 
   // call initialize function of the store to load anecdotes from (mocked) backend:
-  const { result } = renderHook(() => useAnecdoteActions())
+  const { result : actions } = renderHook(() => useAnecdoteActions())
   await act(async () => {
-    await result.current.initialize()
+    await actions.current.initialize()
   })
 
   // mock the update function that only overwrites the anecdote on the server and returns it back
@@ -115,7 +115,6 @@ it('voting increases the number of votes', async () => {
   })
 
   // vote for id
-  const { result: actions } = renderHook(() => useAnecdoteActions())
   await act(async () => { await actions.current.vote(1) })
 
   // check the store, that the vote count is increased
