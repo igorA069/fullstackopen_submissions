@@ -1,11 +1,8 @@
-import { useAnecdotes, useAnecdoteActions, useFilter } from '../store'
+import { useAnecdotes, useAnecdoteActions } from '../store'
 import { useNotificationActions } from '../notificationStore'
 
 export const AnecdoteList = () => {
   const anecdotes = useAnecdotes()
-  const filter = useFilter()
-
-  const filteredAnecdotes = filter ? anecdotes.filter(anecdote => anecdote.content.includes(filter)) : anecdotes
 
   const { vote, remove } = useAnecdoteActions()
   const { showNotification } = useNotificationActions()
@@ -21,7 +18,7 @@ export const AnecdoteList = () => {
   }
 
   return (
-    filteredAnecdotes.map(anecdote => (
+    anecdotes.map(anecdote => (
       <div key={anecdote.id}>
         <div>{anecdote.content}</div>
         <div>

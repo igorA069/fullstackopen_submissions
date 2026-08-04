@@ -44,11 +44,13 @@ export const useAnecdoteStore = create((set) => ({
 
 export const useAnecdotes = () => {
   const anecdotes = useAnecdoteStore((state) => state.anecdotes)
-  return anecdotes.toSorted((a, b) => (b.votes - a.votes))
+  const filter = useFilter()
+  const filteredAnecdotes = filter ? anecdotes.filter(anecdote => anecdote.content.includes(filter)) : anecdotes
+  return filteredAnecdotes.toSorted((a, b) => (b.votes - a.votes))
 }
 export const useAnecdoteActions = () => useAnecdoteStore((state) => state.actions)
 
-const useFilterStore = create(set => ({
+export const useFilterStore = create(set => ({
   filter: null,
   actions: {
     setFilter: text => set(({filter: text}))
