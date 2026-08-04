@@ -6,7 +6,6 @@ export const AnecdoteList = () => {
   const filter = useFilter()
 
   const filteredAnecdotes = filter ? anecdotes.filter(anecdote => anecdote.content.includes(filter)) : anecdotes
-  const sortedAnecdotes = filteredAnecdotes.toSorted((a, b) => (b.votes - a.votes))
 
   const { vote, remove } = useAnecdoteActions()
   const { showNotification } = useNotificationActions()
@@ -22,7 +21,7 @@ export const AnecdoteList = () => {
   }
 
   return (
-    sortedAnecdotes.map(anecdote => (
+    filteredAnecdotes.map(anecdote => (
       <div key={anecdote.id}>
         <div>{anecdote.content}</div>
         <div>

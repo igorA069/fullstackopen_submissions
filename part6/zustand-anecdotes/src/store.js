@@ -10,7 +10,7 @@ const asObject = anecdote => ({
   votes: 0
 })
 
-const useAnecdoteStore = create((set) => ({
+export const useAnecdoteStore = create((set) => ({
   anecdotes: [],
   actions: {
     vote: async (id) => {
@@ -42,7 +42,10 @@ const useAnecdoteStore = create((set) => ({
   }
 }))
 
-export const useAnecdotes = () => useAnecdoteStore((state) => state.anecdotes)
+export const useAnecdotes = () => {
+  const anecdotes = useAnecdoteStore((state) => state.anecdotes)
+  return anecdotes.toSorted((a, b) => (b.votes - a.votes))
+}
 export const useAnecdoteActions = () => useAnecdoteStore((state) => state.actions)
 
 const useFilterStore = create(set => ({
