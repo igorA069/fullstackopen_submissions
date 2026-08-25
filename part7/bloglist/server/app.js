@@ -17,6 +17,9 @@ if (process.env.NODE_ENV === 'test') {
     const testingRouter = require('./controllers/testing')
     app.use('/testing', testingRouter)
 }
+else if (process.env.NODE_ENV === 'prod') {
+    app.use(express.static('../client/dist'))
+}
 
 mongoose.connect(config.MONGODB_CONNECT_STRING, { family: 4 })
 
