@@ -20,6 +20,12 @@ const CreateNew = ({ addAnecdote }) => {
     navigate('/')
   }
 
+  const onReset = () => {
+    contentField.reset()
+    authorField.reset()
+    infoField.reset()
+  }
+
   return (
     <div>
       <h2>create a new anecdote</h2>
@@ -36,7 +42,8 @@ const CreateNew = ({ addAnecdote }) => {
           url for more info
           <input {...infoField} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
+        <button type="button" onClick={onReset}>reset</button>
       </form>
     </div>
   )
