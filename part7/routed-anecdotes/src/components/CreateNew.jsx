@@ -26,21 +26,23 @@ const CreateNew = ({ addAnecdote }) => {
     infoField.reset()
   }
 
+  const pickProperties = ({ type, value, onChange, ...rest }) => ({ type, value, onChange })
+
   return (
     <div>
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...contentField} />
+          <input {...pickProperties(contentField)} />
         </div>
         <div>
           author
-          <input {...authorField} />
+          <input {...pickProperties(authorField)} />
         </div>
         <div>
           url for more info
-          <input {...infoField} />
+          <input {...pickProperties(infoField)} />
         </div>
         <button type="submit">create</button>
         <button type="button" onClick={onReset}>reset</button>
