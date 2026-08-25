@@ -20,9 +20,16 @@ export const useAnecdotes = () => {
   }, [])
 
   const addAnecdote = (anecdote) => {
-    anecdoteService.createNew(anecdote)
-    setAnecdotes(anecdotes.concat(anecdote))
+    anecdoteService.createNew(anecdote).then(response => {
+      setAnecdotes(anecdotes.concat(response))
+    })
   }
 
-  return { anecdotes, addAnecdote }
+  const deleteAnecdote = (id) => {
+    anecdoteService.remove(id).then(() => {
+      setAnecdotes(anecdotes.filter(anecdote => (anecdote.id !== id)))
+    })
+  }
+
+  return { anecdotes, addAnecdote, deleteAnecdote }
 }
