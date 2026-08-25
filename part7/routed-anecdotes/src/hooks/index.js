@@ -1,3 +1,4 @@
+import CreateNew from '../components/CreateNew'
 import anecdoteService from '../services/anecdotes'
 
 import { useState, useEffect } from 'react'
@@ -18,5 +19,10 @@ export const useAnecdotes = () => {
     anecdoteService.getAll().then(response => setAnecdotes(response))
   }, [])
 
-  return { anecdotes }
+  const addAnecdote = (anecdote) => {
+    anecdoteService.createNew(anecdote)
+    setAnecdotes(anecdotes.concat(anecdote))
+  }
+
+  return { anecdotes, addAnecdote }
 }
