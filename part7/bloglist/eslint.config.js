@@ -2,6 +2,10 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+// Note the `/flat` suffix here, the difference from default entry is that
+// `/flat` added `name` property to the exported object to improve
+// [config-inspector](https://eslint.org/blog/2024/04/eslint-config-inspector/) experience.
+import eslintConfigPrettier from "eslint-config-prettier/flat";
 
 export default [
   { ignores: ['dist'] },
@@ -38,5 +42,6 @@ export default [
       'arrow-spacing': ['error', { before: true, after: true }],
       'no-console': 'off'
     }
-  }
+  },
+  eslintConfigPrettier
 ]
