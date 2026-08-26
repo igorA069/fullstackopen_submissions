@@ -1,47 +1,56 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
 // Note the `/flat` suffix here, the difference from default entry is that
 // `/flat` added `name` property to the exported object to improve
 // [config-inspector](https://eslint.org/blog/2024/04/eslint-config-inspector/) experience.
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ["client/dist"] },
   {
-    files: ['**/*.{js,jsx}'],
+    files: ["**/*.{js,jsx}"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
-        ecmaVersion: 'latest',
+        ecmaVersion: "latest",
         ecmaFeatures: { jsx: true },
-        sourceType: 'module'
-      }
+        sourceType: "module",
+      },
     },
     plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
     },
     rules: {
       ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true }
+      "no-unused-vars": ["error", { varsIgnorePattern: "^[A-Z_]" }],
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
       ],
-      indent: ['error', 2],
-      'linebreak-style': ['error', 'unix'],
-      quotes: ['error', 'single'],
-      semi: ['error', 'never'],
-      eqeqeq: 'error',
-      'no-trailing-spaces': 'error',
-      'object-curly-spacing': ['error', 'always'],
-      'arrow-spacing': ['error', { before: true, after: true }],
-      'no-console': 'off'
-    }
+      indent: ["error", 2],
+      "linebreak-style": ["error", "unix"],
+      quotes: ["error", "single"],
+      semi: ["error", "never"],
+      eqeqeq: "error",
+      "no-trailing-spaces": "error",
+      "object-curly-spacing": ["error", "always"],
+      "arrow-spacing": ["error", { before: true, after: true }],
+      "no-console": "off",
+    },
   },
-  eslintConfigPrettier
-]
+  {
+    // Target only the files inside commonjs server subfolder
+    files: ["server/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  eslintConfigPrettier,
+];
