@@ -14,6 +14,8 @@ import Notification from './components/Notification'
 import blogService from './services/blogs'
 import login from './services/login'
 
+import ErrorBoundary from './ErrorBoundary'
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [accessToken, setAccessToken] = useState(null)
@@ -131,39 +133,40 @@ const App = () => {
             ? <Button color='inherit' onClick={ logout }>logout</Button>
             : <Button color='inherit' component={ Link } to='/login'>login</Button> }
         </Toolbar>
-
       </AppBar>
-      <Routes>
-        <Route path='/' element={
-          <>
-            <Notification text={notification} isError={isNotificationError}/>
-            <Blogs blogs={blogs} />
-          </>
-        }/>
-        <Route path='/login' element={
-          <>
-            <Notification text={notification} isError={isNotificationError}/>
-            <LoginForm onSubmit={ onLogin }/>
-          </>
-        }/>
-        <Route path='/blogs/:id' element={
-          blog &&
-                <Blog
-                  blog={blog}
-                  isLikeable={ username != null }
-                  onClickLike={ () => onLikeBlog(blog) }
-                  isDeletable={ blog.user.username === username }
-                  onClickDelete={ () => onDeleteBlog(blog) }
-                />}>
-        </Route>
-        <Route path='/create' element={ 
-          <>
-            <Notification text={notification} isError={isNotificationError}/>
-            <CreateBlogForm onSubmit={ onCreateBlog } /> 
-          </>
-          }>
-        </Route>
-      </Routes>
+      <ErrorBoundary>
+        <Routes>
+          <Route path='/' element={
+            <>
+              <Notification text={notification} isError={isNotificationError}/>
+              <Blogs blogs={blogs} />
+            </>
+          }/>
+          <Route path='/login' element={
+            <>
+              <Notification text={notification} isError={isNotificationError}/>
+              <LoginForm onSubmit={ onLogin }/>
+            </>
+          }/>
+          <Route path='/blogs/:id' element={
+            blog &&
+                  <Blog
+                    blog={blog}
+                    isLikeable={ username != null }
+                    onClickLike={ () => onLikeBlog(blog) }
+                    isDeletable={ blog.user.username === username }
+                    onClickDelete={ () => onDeleteBlog(blog) }
+                  />}>
+          </Route>
+          <Route path='/create' element={
+            <>
+              <Notification text={notification} isError={isNotificationError}/>
+              <CreateBlogForm onSubmit={ onCreateBlog } />
+            </>
+            }>
+          </Route>
+        </Routes>
+      </ErrorBoundary>
     </div>
   )
 }
