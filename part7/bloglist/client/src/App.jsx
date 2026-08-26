@@ -163,8 +163,11 @@ const App = () => {
               <Notification text={notification} isError={isNotificationError}/>
               <CreateBlogForm onSubmit={ onCreateBlog } />
             </>
-            }>
+          }>
           </Route>
+          <Route path='/*' element={
+            <h2>404 - Page not found</h2>
+          }/>
         </Routes>
       </ErrorBoundary>
     </div>
