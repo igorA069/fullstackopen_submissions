@@ -17,17 +17,19 @@ import login from "./services/login";
 import ErrorBoundary from "./ErrorBoundary";
 
 import { useShowNotification } from "./store/notificationStore";
+import { useBlogActions } from "./store/blogStore";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [accessToken, setAccessToken] = useState(null);
   const [username, setUsername] = useState("");
 
   const showNotification = useShowNotification();
 
+  const { addBlog, initBlogs, removeBlog, likeBlog } = useBlogActions();
+
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    initBlogs();
+  });
 
   useEffect(() => {
     setUsername(
@@ -70,7 +72,7 @@ const App = () => {
         user: { username },
         id: response.data.id,
       };
-      setBlogs([...blogs, newBlog]);
+      addBlog(newBlog);
       const isError = false;
       showNotification(`a new blog "${title}" by ${author} added.`, isError);
 
@@ -87,13 +89,7 @@ const App = () => {
   const onLikeBlog = async (blog) => {
     try {
       await blogService.like(blog, accessToken);
-      setBlogs(
-        blogs.map((iterBlog) =>
-          iterBlog.id === blog.id
-            ? { ...iterBlog, likes: iterBlog.likes + 1 }
-            : iterBlog,
-        ),
-      );
+      likeBlog(blog.id);
     } catch (error) {
       const isError = true;
       showNotification(
@@ -109,7 +105,7 @@ const App = () => {
     }
     try {
       await blogService.remove(blog, accessToken);
-      setBlogs(blogs.filter((iterBlog) => iterBlog.id !== blog.id));
+      removeBlog(blog.id);
 
       navigate("/");
     } catch (error) {
@@ -130,8 +126,9 @@ const App = () => {
     navigate("/");
   };
 
+  const isDeletable = (blog) => blog.user.username === username;
+
   const match = useMatch("/blogs/:id");
-  const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null;
 
   const padding = {
     padding: "5px",
@@ -170,7 +167,7 @@ const App = () => {
             element={
               <>
                 <Notification />
-                <Blogs blogs={blogs} />
+                <Blogs />
               </>
             }
           />
@@ -186,15 +183,12 @@ const App = () => {
           <Route
             path="/blogs/:id"
             element={
-              blog && (
-                <Blog
-                  blog={blog}
-                  isLikeable={username != null}
-                  onClickLike={() => onLikeBlog(blog)}
-                  isDeletable={blog.user.username === username}
-                  onClickDelete={() => onDeleteBlog(blog)}
-                />
-              )
+              <Blog
+                isLikeable={username != null}
+                onClickLike={onLikeBlog}
+                isDeletable={isDeletable}
+                onClickDelete={onDeleteBlog}
+              />
             }
           ></Route>
           <Route
