@@ -1,10 +1,19 @@
-import { Alert } from "@mui/material"
-const Notification = (props) => {
-  if (props.text) {
-    return <Alert severity={ props.isError ? 'error' : 'success'} sx={{ mt: 2 }}>{ props.text }</Alert>
-  } else {
-    return null
-  }
-}
+import { Alert } from "@mui/material";
 
-export default Notification
+import { useNotification } from "../store/notificationStore";
+
+const Notification = () => {
+  const { message, isError } = useNotification();
+
+  if (message) {
+    return (
+      <Alert severity={isError ? "error" : "success"} sx={{ mt: 2 }}>
+        {message}
+      </Alert>
+    );
+  } else {
+    return null;
+  }
+};
+
+export default Notification;
