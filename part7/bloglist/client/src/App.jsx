@@ -11,7 +11,6 @@ import CreateBlogForm from "./components/CreateBlogForm";
 import Notification from "./components/Notification";
 
 import blogService from "./services/blogs";
-import login from "./services/login";
 
 import ErrorBoundary from "./ErrorBoundary";
 
@@ -23,6 +22,7 @@ import {
   useLoginActions,
 } from "./store/loginStore";
 import { useManageBlogs } from "./hooks/useManageBlogs";
+import { useAuth } from "./hooks/useAuth";
 
 const App = () => {
   const showNotification = useShowNotification();
@@ -34,6 +34,7 @@ const App = () => {
   const accessToken = useAccessToken();
 
   const { executeCreateBlog } = useManageBlogs();
+  const { executeLogin } = useAuth();
 
   useEffect(() => {
     initBlogs();
@@ -47,27 +48,6 @@ const App = () => {
   }, []);
 
   const navigate = useNavigate();
-
-  const onLogin = async (username, password) => {
-    // attempt to login
-    try {
-      const accessToken = await login(username, password);
-      // if successfull, store the token
-      setAccessToken(accessToken);
-      setUsername(username);
-
-      window.localStorage.setItem("blogApplication.loggedInUserName", username);
-      window.localStorage.setItem("blogApplication.accessToken", accessToken);
-
-      navigate("/");
-    } catch (error) {
-      const isError = true;
-      showNotification(
-        `Status ${error.response.status}: ${JSON.stringify(error.response.data)}`,
-        isError,
-      );
-    }
-  };
 
   const onLikeBlog = async (blog) => {
     try {
@@ -130,7 +110,7 @@ const App = () => {
             element={
               <>
                 <Notification />
-                <LoginForm onSubmit={onLogin} />
+                <LoginForm onSubmit={executeLogin} />
               </>
             }
           />
