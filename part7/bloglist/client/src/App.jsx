@@ -34,7 +34,7 @@ const App = () => {
   const accessToken = useAccessToken();
 
   const { executeCreateBlog } = useManageBlogs();
-  const { executeLogin } = useAuth();
+  const { executeLogin, executeLogout } = useAuth();
 
   useEffect(() => {
     initBlogs();
@@ -80,20 +80,11 @@ const App = () => {
     }
   };
 
-  const logout = () => {
-    window.localStorage.removeItem("blogApplication.loggedInUserName");
-    window.localStorage.removeItem("blogApplication.accessToken");
-    setUsername(null);
-    setAccessToken(null);
-
-    navigate("/");
-  };
-
   const isDeletable = (blog) => blog.user.username === username;
 
   return (
     <div>
-      <Menu onLogout={logout} />
+      <Menu onLogout={executeLogout} />
       <ErrorBoundary>
         <Routes>
           <Route

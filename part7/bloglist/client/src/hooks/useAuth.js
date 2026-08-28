@@ -34,5 +34,14 @@ export const useAuth = () => {
     }
   };
 
-  return { executeLogin };
+  const executeLogout = () => {
+    window.localStorage.removeItem("blogApplication.loggedInUserName");
+    window.localStorage.removeItem("blogApplication.accessToken");
+    setUsername(null);
+    setAccessToken(null);
+
+    navigate("/");
+  };
+
+  return { executeLogin, executeLogout };
 };
