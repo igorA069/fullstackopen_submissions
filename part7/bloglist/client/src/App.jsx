@@ -22,15 +22,18 @@ import {
   useAccessToken,
   useLoginActions,
 } from "./store/loginStore";
+import { useManageBlogs } from "./hooks/useManageBlogs";
 
 const App = () => {
   const showNotification = useShowNotification();
 
-  const { addBlog, initBlogs, removeBlog, likeBlog } = useBlogActions();
+  const { initBlogs, removeBlog, likeBlog } = useBlogActions();
 
   const username = useUsername();
   const { setUsername, setAccessToken } = useLoginActions();
   const accessToken = useAccessToken();
+
+  const { executeCreateBlog } = useManageBlogs();
 
   useEffect(() => {
     initBlogs();
@@ -55,31 +58,6 @@ const App = () => {
 
       window.localStorage.setItem("blogApplication.loggedInUserName", username);
       window.localStorage.setItem("blogApplication.accessToken", accessToken);
-
-      navigate("/");
-    } catch (error) {
-      const isError = true;
-      showNotification(
-        `Status ${error.response.status}: ${JSON.stringify(error.response.data)}`,
-        isError,
-      );
-    }
-  };
-
-  const onCreateBlog = async (title, author, url) => {
-    try {
-      const response = await blogService.add(title, author, url, accessToken);
-      const newBlog = {
-        title,
-        author,
-        url,
-        likes: 0,
-        user: { username },
-        id: response.data.id,
-      };
-      addBlog(newBlog);
-      const isError = false;
-      showNotification(`a new blog "${title}" by ${author} added.`, isError);
 
       navigate("/");
     } catch (error) {
@@ -172,7 +150,7 @@ const App = () => {
             element={
               <>
                 <Notification />
-                <CreateBlogForm onSubmit={onCreateBlog} />
+                <CreateBlogForm onSubmit={executeCreateBlog} />
               </>
             }
           ></Route>
