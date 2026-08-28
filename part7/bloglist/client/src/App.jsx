@@ -18,14 +18,15 @@ import ErrorBoundary from "./ErrorBoundary";
 
 import { useShowNotification } from "./store/notificationStore";
 import { useBlogActions } from "./store/blogStore";
+import { useUsername, useLoginActions } from "./store/loginStore";
 
 const App = () => {
   const [accessToken, setAccessToken] = useState(null);
-  const [username, setUsername] = useState("");
 
   const showNotification = useShowNotification();
-
   const { addBlog, initBlogs, removeBlog, likeBlog } = useBlogActions();
+  const username = useUsername();
+  const { setUsername } = useLoginActions();
 
   useEffect(() => {
     initBlogs();
