@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
-import { useNavigate, useMatch } from "react-router";
+import { useNavigate } from "react-router";
 import { Routes, Route, Link } from "react-router";
 
-import { AppBar, Toolbar, Button, Typography } from "@mui/material";
-
+import { Menu } from "./components/Menu";
 import Blogs from "./components/Blogs";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
@@ -134,38 +133,9 @@ const App = () => {
 
   const isDeletable = (blog) => blog.user.username === username;
 
-  const match = useMatch("/blogs/:id");
-
-  const padding = {
-    padding: "5px",
-  };
-
   return (
     <div>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Blog App
-          </Typography>
-          <Button color="inherit" component={Link} to="/">
-            blogs
-          </Button>
-          {username && (
-            <Button color="inherit" component={Link} to="/create">
-              new blog
-            </Button>
-          )}
-          {username ? (
-            <Button color="inherit" onClick={logout}>
-              logout
-            </Button>
-          ) : (
-            <Button color="inherit" component={Link} to="/login">
-              login
-            </Button>
-          )}
-        </Toolbar>
-      </AppBar>
+      <Menu onLogout={logout} />
       <ErrorBoundary>
         <Routes>
           <Route
