@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 
 import login from "../services/login";
+import { saveUser, removeUser } from "../services/persistentUser";
 
 import { useLoginActions } from "../store/loginStore";
 
@@ -21,8 +22,7 @@ export const useAuth = () => {
       setAccessToken(accessToken);
       setUsername(username);
 
-      window.localStorage.setItem("blogApplication.loggedInUserName", username);
-      window.localStorage.setItem("blogApplication.accessToken", accessToken);
+      saveUser(username, accessToken);
 
       navigate("/");
     } catch (error) {
@@ -35,8 +35,8 @@ export const useAuth = () => {
   };
 
   const executeLogout = () => {
-    window.localStorage.removeItem("blogApplication.loggedInUserName");
-    window.localStorage.removeItem("blogApplication.accessToken");
+    removeUser();
+
     setUsername(null);
     setAccessToken(null);
 

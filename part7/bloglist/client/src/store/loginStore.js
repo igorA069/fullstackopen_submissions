@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const useLogin = create((set) => ({
+export const useLoginStore = create((set) => ({
   username: "",
   accessToken: null,
 
@@ -16,7 +16,7 @@ const useLogin = create((set) => ({
   },
 }));
 
-export const useUsername = () => useLogin((state) => state.username);
-export const useAccessToken = () => useLogin((state) => state.accessToken);
+export const useUsername = () => useLoginStore((state) => state.username);
+export const useAccessToken = () => useLoginStore((state) => state.accessToken);
 
-export const useLoginActions = () => useLogin((state) => state.actions);
+export const useLoginActions = () => useLoginStore((state) => state.actions);
