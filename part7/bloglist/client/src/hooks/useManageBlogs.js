@@ -15,7 +15,7 @@ export const useManageBlogs = () => {
   const username = useUsername();
 
   // global state (actions):
-  const { addBlog } = useBlogActions();
+  const { addBlog, removeBlog, likeBlog } = useBlogActions();
 
   // UI:
   const showNotification = useShowNotification();
@@ -45,5 +45,36 @@ export const useManageBlogs = () => {
     }
   };
 
-  return { executeCreateBlog };
+  const executeLikeBlog = async (blog) => {
+    try {
+      await blogService.like(blog, accessToken);
+      likeBlog(blog.id);
+    } catch (error) {
+      const isError = true;
+      showNotification(
+        `Status ${error.response.status}: ${JSON.stringify(error.response.data)}`,
+        isError,
+      );
+    }
+  };
+
+  const executeRemoveBlog = async (blog) => {
+    if (!window.confirm(`Remove blog "${blog.title}" by ${blog.author} ?`)) {
+      return;
+    }
+    try {
+      await blogService.remove(blog, accessToken);
+      removeBlog(blog.id);
+
+      navigate("/");
+    } catch (error) {
+      const isError = true;
+      showNotification(
+        `Status ${error.response.status}: ${JSON.stringify(error.response.data)}`,
+        isError,
+      );
+    }
+  };
+
+  return { executeCreateBlog, executeRemoveBlog, executeLikeBlog };
 };

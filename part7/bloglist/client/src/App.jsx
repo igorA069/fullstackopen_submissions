@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 
-import { useNavigate } from "react-router";
 import { Routes, Route, Link } from "react-router";
 
 import { Menu } from "./components/Menu";
@@ -10,31 +9,25 @@ import LoginForm from "./components/LoginForm";
 import CreateBlogForm from "./components/CreateBlogForm";
 import Notification from "./components/Notification";
 
-import blogService from "./services/blogs";
-
 import ErrorBoundary from "./ErrorBoundary";
 
-import { useShowNotification } from "./store/notificationStore";
 import { useBlogActions } from "./store/blogStore";
-import {
-  useUsername,
-  useAccessToken,
-  useLoginActions,
-} from "./store/loginStore";
+import { useUsername, useLoginActions } from "./store/loginStore";
+
 import { useManageBlogs } from "./hooks/useManageBlogs";
 import { useAuth } from "./hooks/useAuth";
 
 const App = () => {
-  const showNotification = useShowNotification();
-
-  const { initBlogs, removeBlog, likeBlog } = useBlogActions();
-
   const username = useUsername();
-  const { setUsername, setAccessToken } = useLoginActions();
-  const accessToken = useAccessToken();
 
-  const { executeCreateBlog } = useManageBlogs();
+  const { initBlogs } = useBlogActions();
+
+  const { setUsername, setAccessToken } = useLoginActions();
+
   const { executeLogin, executeLogout } = useAuth();
+
+  const { executeCreateBlog, executeRemoveBlog, executeLikeBlog } =
+    useManageBlogs();
 
   useEffect(() => {
     initBlogs();
@@ -46,39 +39,6 @@ const App = () => {
     );
     setAccessToken(window.localStorage.getItem("blogApplication.accessToken"));
   }, []);
-
-  const navigate = useNavigate();
-
-  const onLikeBlog = async (blog) => {
-    try {
-      await blogService.like(blog, accessToken);
-      likeBlog(blog.id);
-    } catch (error) {
-      const isError = true;
-      showNotification(
-        `Status ${error.response.status}: ${JSON.stringify(error.response.data)}`,
-        isError,
-      );
-    }
-  };
-
-  const onDeleteBlog = async (blog) => {
-    if (!window.confirm(`Remove blog "${blog.title}" by ${blog.author} ?`)) {
-      return;
-    }
-    try {
-      await blogService.remove(blog, accessToken);
-      removeBlog(blog.id);
-
-      navigate("/");
-    } catch (error) {
-      const isError = true;
-      showNotification(
-        `Status ${error.response.status}: ${JSON.stringify(error.response.data)}`,
-        isError,
-      );
-    }
-  };
 
   const isDeletable = (blog) => blog.user.username === username;
 
@@ -110,9 +70,9 @@ const App = () => {
             element={
               <Blog
                 isLikeable={username != null}
-                onClickLike={onLikeBlog}
+                onClickLike={executeLikeBlog}
                 isDeletable={isDeletable}
-                onClickDelete={onDeleteBlog}
+                onClickDelete={executeRemoveBlog}
               />
             }
           ></Route>
