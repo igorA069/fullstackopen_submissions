@@ -23,7 +23,12 @@ export const useManageBlogs = () => {
 
   const executeCreateBlog = async (title, author, url) => {
     try {
-      const response = await blogService.add(title, author, url, accessToken);
+      const response = await blogService.requestAddBlog(
+        title,
+        author,
+        url,
+        accessToken,
+      );
       const newBlog = {
         title,
         author,
@@ -48,7 +53,7 @@ export const useManageBlogs = () => {
 
   const executeLikeBlog = async (blog) => {
     try {
-      await blogService.like(blog, accessToken);
+      await blogService.requestLikeBlog(blog, accessToken);
       likeBlogInStore(blog.id);
     } catch (error) {
       const isError = true;
@@ -64,7 +69,7 @@ export const useManageBlogs = () => {
       return;
     }
     try {
-      await blogService.remove(blog, accessToken);
+      await blogService.requestRemoveBlog(blog, accessToken);
       removeBlogFromStore(blog.id);
 
       navigate("/");

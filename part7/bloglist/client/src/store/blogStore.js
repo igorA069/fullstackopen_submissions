@@ -8,7 +8,7 @@ const useBlogStore = create((set) => ({
     addBlogToStore: (blog) =>
       set((state) => ({ blogs: state.blogs.concat(blog) })),
     initBlogsInStore: async () => {
-      const newBlogs = await blogService.getAll();
+      const newBlogs = await blogService.requestAllBlogs();
       set({ blogs: newBlogs });
     },
     removeBlogFromStore: (id) =>
