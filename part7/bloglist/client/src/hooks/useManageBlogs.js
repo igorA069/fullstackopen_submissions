@@ -15,7 +15,8 @@ export const useManageBlogs = () => {
   const username = useUsername();
 
   // global state (actions):
-  const { addBlog, removeBlog, likeBlog } = useBlogActions();
+  const { addBlogToStore, removeBlogFromStore, likeBlogInStore } =
+    useBlogActions();
 
   // UI:
   const showNotification = useShowNotification();
@@ -31,7 +32,7 @@ export const useManageBlogs = () => {
         user: { username },
         id: response.data.id,
       };
-      addBlog(newBlog);
+      addBlogToStore(newBlog);
       const isError = false;
       showNotification(`a new blog "${title}" by ${author} added.`, isError);
 
@@ -48,7 +49,7 @@ export const useManageBlogs = () => {
   const executeLikeBlog = async (blog) => {
     try {
       await blogService.like(blog, accessToken);
-      likeBlog(blog.id);
+      likeBlogInStore(blog.id);
     } catch (error) {
       const isError = true;
       showNotification(
@@ -64,7 +65,7 @@ export const useManageBlogs = () => {
     }
     try {
       await blogService.remove(blog, accessToken);
-      removeBlog(blog.id);
+      removeBlogFromStore(blog.id);
 
       navigate("/");
     } catch (error) {

@@ -20,7 +20,7 @@ import { useAuth } from "./hooks/useAuth";
 const App = () => {
   const username = useUsername();
 
-  const { initBlogs } = useBlogActions();
+  const { initBlogsInStore } = useBlogActions();
 
   const { setUsername, setAccessToken } = useLoginActions();
 
@@ -30,7 +30,7 @@ const App = () => {
     useManageBlogs();
 
   useEffect(() => {
-    initBlogs();
+    initBlogsInStore();
   });
 
   useEffect(() => {
