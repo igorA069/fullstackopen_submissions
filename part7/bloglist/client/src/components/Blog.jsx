@@ -46,6 +46,19 @@ const Blog = ({ isLikeable, onClickLike, isDeletable, onClickDelete }) => {
             </Button>
           )}
         </Typography>
+
+        {blog.comments && blog.comments.length > 0 && (
+          <>
+            <Typography variant="h6" gutterBottom>
+              comments
+            </Typography>
+            <ul>
+              {blog.comments.map((comment) => (
+                <li key={comment}>{comment}</li>
+              ))}
+            </ul>
+          </>
+        )}
       </Paper>
     )
   );
