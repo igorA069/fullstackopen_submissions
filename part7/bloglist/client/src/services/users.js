@@ -5,3 +5,11 @@ export const requestAllUsers = async () => {
   }
   return await response.json();
 };
+
+export const requestUserById = async (id) => {
+  const response = await fetch(`/api/users/${id}`);
+  if (!response.ok) {
+    throw new Error("Unable to fetch user by id");
+  }
+  return await response.json();
+};

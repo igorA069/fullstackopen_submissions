@@ -1,18 +1,17 @@
 import { useParams } from "react-router";
 
-import { useUsers } from "../hooks/useUsers";
+import { useUserById } from "../hooks/useUsers";
 
 import { Typography } from "@mui/material";
 
 export const User = () => {
   const params = useParams();
-  const { users, usersQueryPending } = useUsers();
+  const { user: userById, userQueryPending } = useUserById(params.id);
 
-  if (usersQueryPending) {
+  if (userQueryPending) {
     return <>Please wait</>;
   }
 
-  const userById = users.find((user) => user.id === params.id);
   const userBlogs = userById.blogs;
   return (
     <>
