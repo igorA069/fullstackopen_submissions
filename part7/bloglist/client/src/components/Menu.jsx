@@ -21,6 +21,11 @@ export const Menu = ({ onLogout }) => {
             new blog
           </Button>
         )}
+        {username && (
+          <Button color="inherit" component={Link} to="/users">
+            users
+          </Button>
+        )}
         {username ? (
           <Button color="inherit" onClick={onLogout}>
             logout

@@ -17,6 +17,7 @@ import Blogs from "./components/Blogs";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import CreateBlogForm from "./components/CreateBlogForm";
+import { Users } from "./components/Users";
 import Notification from "./components/Notification";
 
 const App = () => {
@@ -73,6 +74,7 @@ const App = () => {
               />
             }
           ></Route>
+          <Route path="/users" element={<Users />}></Route>
           <Route
             path="/create"
             element={
