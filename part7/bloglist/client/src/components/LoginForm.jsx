@@ -1,44 +1,39 @@
-import { useState } from 'react'
-import { Button, TextField } from '@mui/material'
-const LoginForm = ({ onSubmit }) => {
+import { useField } from "../hooks/useField";
+import { Button, TextField } from "@mui/material";
 
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+const LoginForm = ({ onSubmit }) => {
+  const usernameField = useField("username");
+  const { reset: _resetUsernameField, ...usernameFieldProps } = usernameField;
+
+  const passwordField = useField("password");
+  const { reset: _resetPasswordField, ...passwordFieldProps } = passwordField;
 
   const internalOnSubmit = (event) => {
-    event.preventDefault()
-    onSubmit(username, password)
-  }
+    event.preventDefault();
+    onSubmit(usernameField.value, passwordField.value);
+  };
 
   return (
     <div>
       <h2>log in to application</h2>
-      <form onSubmit={ event => internalOnSubmit(event) }>
+      <form onSubmit={(event) => internalOnSubmit(event)}>
         <div>
-          <TextField 
-            value={ username } 
-            onChange={ event => setUsername(event.target.value) } 
-            type='text' 
-            label='username' 
-            variant='standard'
-            size='small' 
-          />
+          <TextField {...usernameFieldProps} variant="standard" size="small" />
         </div>
         <div>
-          <TextField 
-            value={ password } 
-            onChange={ event => setPassword(event.target.value) } 
-            type='password' 
-            label='password' 
-            variant='standard'
-            size='small' 
+          <TextField
+            {...passwordFieldProps}
+            type="password"
+            variant="standard"
+            size="small"
           />
         </div>
-        <Button type='submit' variant='contained' sx={{ mt: 1 }}>
+        <Button type="submit" variant="contained" sx={{ mt: 1 }}>
           login
         </Button>
       </form>
-    </div>)
-}
+    </div>
+  );
+};
 
-export default LoginForm
+export default LoginForm;
