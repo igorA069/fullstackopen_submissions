@@ -7,6 +7,7 @@ import {
   TableRow,
   TableCell,
   Typography,
+  Link,
 } from "@mui/material";
 
 export const Users = () => {
@@ -30,7 +31,9 @@ export const Users = () => {
         <TableBody>
           {users.map((user) => (
             <TableRow key={user.id}>
-              <TableCell>{user.name}</TableCell>
+              <TableCell>
+                <Link href={`/users/${user.id}`}>{user.name}</Link>
+              </TableCell>
               <TableCell>{user.username}</TableCell>
               <TableCell>{user.blogs.length}</TableCell>
             </TableRow>

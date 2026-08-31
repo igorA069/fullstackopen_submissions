@@ -18,6 +18,7 @@ import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import CreateBlogForm from "./components/CreateBlogForm";
 import { Users } from "./components/Users";
+import { User } from "./components/User";
 import Notification from "./components/Notification";
 
 const App = () => {
@@ -75,6 +76,7 @@ const App = () => {
             }
           ></Route>
           <Route path="/users" element={<Users />}></Route>
+          <Route path="/users/:id" element={<User />}></Route>
           <Route
             path="/create"
             element={
