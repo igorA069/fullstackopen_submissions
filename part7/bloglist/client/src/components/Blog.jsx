@@ -1,11 +1,22 @@
-import { Paper, Typography, Button } from "@mui/material";
 import { useParams } from "react-router";
 
 import { useBlogById } from "../store/blogStore";
 
+import { useManageBlogs } from "../hooks/useManageBlogs";
+
+import { Paper, Typography, Button } from "@mui/material";
+
+import { Comments } from "./Comments";
+
 const Blog = ({ isLikeable, onClickLike, isDeletable, onClickDelete }) => {
   const params = useParams();
   const blog = useBlogById(params.id);
+
+  const { executeCommentBlog } = useManageBlogs();
+
+  const onAddComment = (comment) => {
+    executeCommentBlog(blog, comment);
+  };
 
   return (
     blog && (
@@ -47,18 +58,7 @@ const Blog = ({ isLikeable, onClickLike, isDeletable, onClickDelete }) => {
           )}
         </Typography>
 
-        {blog.comments && blog.comments.length > 0 && (
-          <>
-            <Typography variant="h6" gutterBottom>
-              comments
-            </Typography>
-            <ul>
-              {blog.comments.map((comment) => (
-                <li key={comment}>{comment}</li>
-              ))}
-            </ul>
-          </>
-        )}
+        <Comments comments={blog.comments} onAddComment={onAddComment} />
       </Paper>
     )
   );

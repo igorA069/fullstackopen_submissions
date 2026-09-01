@@ -7,16 +7,28 @@ const useBlogStore = create((set) => ({
   actions: {
     addBlogToStore: (blog) =>
       set((state) => ({ blogs: state.blogs.concat(blog) })),
+
     initBlogsInStore: async () => {
       const newBlogs = await blogService.requestAllBlogs();
       set({ blogs: newBlogs });
     },
+
     removeBlogFromStore: (id) =>
       set((state) => ({ blogs: state.blogs.filter((blog) => blog.id !== id) })),
+
     likeBlogInStore: (id) =>
       set((state) => ({
         blogs: state.blogs.map((blog) =>
           blog.id !== id ? blog : { ...blog, likes: blog.likes + 1 },
+        ),
+      })),
+
+    commentBlogInStore: (id, comment) =>
+      set((state) => ({
+        blogs: state.blogs.map((blog) =>
+          blog.id !== id
+            ? blog
+            : { ...blog, comments: blog.comments.concat(comment) },
         ),
       })),
   },

@@ -22,6 +22,18 @@ const requestLikeBlog = async (blog, accessToken) => {
   );
 };
 
+const requestCommentBlog = async (blog, comment, accessToken) => {
+  console.log("ok");
+
+  await axios.post(
+    `${baseUrl}/${blog.id}/comments`,
+    { content: comment },
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
+};
+
 const requestRemoveBlog = async (blog, accessToken) => {
   await axios.delete(`${baseUrl}/${blog.id}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
@@ -32,5 +44,6 @@ export default {
   requestAllBlogs,
   requestAddBlog,
   requestLikeBlog,
+  requestCommentBlog,
   requestRemoveBlog,
 };
