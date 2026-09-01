@@ -4,7 +4,7 @@ import { useBlogById } from "../store/blogStore";
 
 import { useManageBlogs } from "../hooks/useManageBlogs";
 
-import { Paper, Typography, Button } from "@mui/material";
+import { Paper, Button } from "@mui/material";
 
 import { Comments } from "./Comments";
 
@@ -21,43 +21,35 @@ const Blog = ({ isLikeable, onClickLike, isDeletable, onClickDelete }) => {
   return (
     blog && (
       <Paper elevation={3} sx={{ p: 2, mt: 2 }}>
-        <Typography variant="h4" gutterBottom>
-          {blog.title}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          by {blog.author}
-        </Typography>
-        <Typography variant="body2" gutterBottom>
-          <a href={blog.url}>{blog.url}</a>
-        </Typography>
-        <Typography variant="body2" gutterBottom>
-          Added by {blog.user.name}
-        </Typography>
-        <Typography variant="body1" gutterBottom>
-          {blog.likes} likes
-          {isLikeable && (
-            <Button
-              onClick={() => onClickLike(blog)}
-              variant="outlined"
-              size="small"
-              sx={{ ml: 1 }}
-            >
-              like
-            </Button>
-          )}
-          {isDeletable(blog) && (
-            <Button
-              onClick={() => onClickDelete(blog)}
-              color="error"
-              variant="outlined"
-              size="small"
-              sx={{ ml: 1 }}
-            >
-              remove
-            </Button>
-          )}
-        </Typography>
-
+        <h2>{blog.title}</h2>
+        <h3>by {blog.author}</h3>
+        <a href={blog.url}>{blog.url}</a>
+        <br />
+        Added by {blog.user.name}
+        <br />
+        <br />
+        {blog.likes} likes
+        {isLikeable && (
+          <Button
+            onClick={() => onClickLike(blog)}
+            variant="outlined"
+            size="small"
+            sx={{ ml: 1 }}
+          >
+            like
+          </Button>
+        )}
+        {isDeletable(blog) && (
+          <Button
+            onClick={() => onClickDelete(blog)}
+            color="error"
+            variant="outlined"
+            size="small"
+            sx={{ ml: 1 }}
+          >
+            remove
+          </Button>
+        )}
         <Comments comments={blog.comments} onAddComment={onAddComment} />
       </Paper>
     )

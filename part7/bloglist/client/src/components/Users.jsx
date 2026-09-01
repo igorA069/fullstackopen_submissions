@@ -6,7 +6,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Typography,
   Link,
 } from "@mui/material";
 
@@ -19,7 +18,7 @@ export const Users = () => {
 
   return (
     <>
-      <Typography variant="h4">Users</Typography>
+      <h2>Users</h2>
       <Table>
         <TableHead>
           <TableRow>

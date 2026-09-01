@@ -2,8 +2,6 @@ import { useParams } from "react-router";
 
 import { useUserById } from "../hooks/useUsers";
 
-import { Typography } from "@mui/material";
-
 export const User = () => {
   const params = useParams();
   const { user: userById, userQueryPending } = useUserById(params.id);
@@ -15,8 +13,8 @@ export const User = () => {
   const userBlogs = userById.blogs;
   return (
     <>
-      <Typography variant="h4">{userById.username}</Typography>
-      <Typography variant="h6">added blogs</Typography>
+      <h2>{userById.username}</h2>
+      <h3>added blogs</h3>
       <ul>
         {userBlogs.map((blog) => (
           <li key={blog.id}>{blog.title}</li>

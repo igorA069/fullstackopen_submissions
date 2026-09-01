@@ -1,6 +1,6 @@
 import { useField } from "../hooks/useField";
 
-import { TextField, Typography, Button } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 
 export const Comments = ({ comments, onAddComment }) => {
   const commentField = useField("add a comment");
@@ -8,9 +8,7 @@ export const Comments = ({ comments, onAddComment }) => {
 
   return (
     <>
-      <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-        comments
-      </Typography>
+      <h3>comments</h3>
 
       <form onSubmit={() => onAddComment(commentField.value)}>
         <TextField {...commentFieldProps} size="small" sx={{ mr: 1 }} />
