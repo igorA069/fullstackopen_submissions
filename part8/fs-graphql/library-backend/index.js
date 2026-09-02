@@ -118,6 +118,10 @@ const typeDefs = /*GraphQL*/ `
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
   }
+
+  type Mutation {
+    addBook(title: String!, author: String!, published: Int!, genres: [String!]!): Book!
+  }
 `;
 
 const resolvers = {
@@ -143,6 +147,29 @@ const resolvers = {
         ...author,
         bookCount: books.filter((book) => book.author === author.name).length,
       })),
+  },
+
+  Mutation: {
+    addBook: (root, args) => {
+      const newBook = {
+        title: args.title,
+        author: args.author,
+        published: args.published,
+        genres: args.genres,
+      };
+      books = books.concat(newBook);
+
+      // Add author if it does not exist yet:
+      const existingAuthorNames = authors.map((author) => author.name);
+      const isExistingAuthor = existingAuthorNames.some(
+        (existingAuthorName) =>
+          existingAuthorName.toLowerCase() === args.author.toLowerCase(),
+      );
+      if (!isExistingAuthor) {
+        authors = authors.concat({ name: args.author });
+      }
+      return newBook;
+    },
   },
 };
 
