@@ -1,6 +1,8 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
 
+const { isExistingAuthor } = require("./utils");
+
 let authors = [
   {
     name: "Robert Martin",
@@ -121,6 +123,8 @@ const typeDefs = /*GraphQL*/ `
 
   type Mutation {
     addBook(title: String!, author: String!, published: Int!, genres: [String!]!): Book!
+
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 `;
 
@@ -160,15 +164,25 @@ const resolvers = {
       books = books.concat(newBook);
 
       // Add author if it does not exist yet:
-      const existingAuthorNames = authors.map((author) => author.name);
-      const isExistingAuthor = existingAuthorNames.some(
-        (existingAuthorName) =>
-          existingAuthorName.toLowerCase() === args.author.toLowerCase(),
-      );
-      if (!isExistingAuthor) {
+      const authorExists = isExistingAuthor(args.author, authors);
+      if (!authorExists) {
         authors = authors.concat({ name: args.author });
       }
       return newBook;
+    },
+
+    editAuthor: (root, args) => {
+      if (!isExistingAuthor(args.name, authors)) {
+        return null;
+      }
+      const authorToUpdate = authors.find(
+        (author) => author.name === args.name,
+      );
+      authorToUpdate.born = args.setBornTo;
+      authors = authors.map((author) =>
+        author.name !== args.name ? author : authorToUpdate,
+      );
+      return authorToUpdate;
     },
   },
 };
