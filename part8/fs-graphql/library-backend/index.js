@@ -1,6 +1,8 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
 
+const { v1: uuid } = require("uuid");
+
 const { isExistingAuthor } = require("./utils");
 
 let authors = [
@@ -161,13 +163,14 @@ const resolvers = {
         author: args.author,
         published: args.published,
         genres: args.genres,
+        id: uuid(),
       };
       books = books.concat(newBook);
 
       // Add author if it does not exist yet:
       const authorExists = isExistingAuthor(args.author, authors);
       if (!authorExists) {
-        authors = authors.concat({ name: args.author });
+        authors = authors.concat({ name: args.author, id: uuid() });
       }
       return newBook;
     },
