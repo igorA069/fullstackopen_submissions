@@ -23,14 +23,14 @@ const NewBook = (props) => {
 
     addBookMutation({
       variables: { title, author, published: parseInt(published), genres },
+      onCompleted: () => {
+        setTitle("");
+        setPublished("");
+        setAuthor("");
+        setGenres([]);
+        setGenre("");
+      },
     });
-    console.log("add book...");
-
-    setTitle("");
-    setPublished("");
-    setAuthor("");
-    setGenres([]);
-    setGenre("");
   };
 
   const addGenre = () => {
@@ -40,7 +40,14 @@ const NewBook = (props) => {
 
   return (
     <div>
-      <form onSubmit={submit}>
+      <form
+        id="genre-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          addGenre();
+        }}
+      ></form>
+      <form id="book-form" onSubmit={submit}>
         <div>
           <label>
             title
@@ -72,10 +79,11 @@ const NewBook = (props) => {
         <label>
           <div>
             <input
+              form="genre-form"
               value={genre}
               onChange={({ target }) => setGenre(target.value)}
             />
-            <button onClick={addGenre} type="button">
+            <button form="genre-form" type="submit">
               add genre
             </button>
           </div>
