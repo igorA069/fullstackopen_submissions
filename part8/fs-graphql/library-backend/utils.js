@@ -6,4 +6,10 @@ const isExistingAuthor = (authorName, existingAuthors) => {
   );
 };
 
-module.exports = { isExistingAuthor };
+const getAuthorBookCount = (books, authorName) =>
+  books.filter((b) => b.author === authorName).length;
+
+const getAuthorByName = (authors, authorName) =>
+  authors.find((a) => a.name === authorName);
+
+module.exports = { isExistingAuthor, getAuthorBookCount, getAuthorByName };

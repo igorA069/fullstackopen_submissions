@@ -1,6 +1,10 @@
 const { v1: uuid } = require("uuid");
 
-const { isExistingAuthor } = require("./utils");
+const {
+  isExistingAuthor,
+  getAuthorBookCount,
+  getAuthorByName,
+} = require("./utils");
 
 let authors = [
   {
@@ -109,7 +113,14 @@ const resolvers = {
         : booksFilteredByAuthor.filter((book) =>
             book.genres.includes(args.genre),
           );
-      return booksFilteredByGenre;
+      return booksFilteredByGenre.map((book) => ({
+        ...book,
+        author: {
+          // return an object instead of just the name string
+          ...getAuthorByName(authors, book.author),
+          bookCount: getAuthorBookCount(books, book.author),
+        },
+      }));
     },
 
     allAuthors: () =>
@@ -133,9 +144,16 @@ const resolvers = {
       // Add author if it does not exist yet:
       const authorExists = isExistingAuthor(args.author, authors);
       if (!authorExists) {
-        authors = authors.concat({ name: args.author, id: uuid() });
+        authors = authors.concat({
+          name: args.author,
+          id: uuid(),
+          bookCount: 1,
+        });
       }
-      return newBook;
+      return {
+        ...newBook,
+        author: getAuthorByName(authors, newBook.author),
+      };
     },
 
     editAuthor: (root, args) => {
@@ -149,7 +167,10 @@ const resolvers = {
       authors = authors.map((author) =>
         author.name !== args.name ? author : authorToUpdate,
       );
-      return authorToUpdate;
+      return {
+        ...authorToUpdate,
+        bookCount: getAuthorBookCount(books, authorToUpdate.name),
+      };
     },
   },
 };
