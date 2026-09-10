@@ -1,4 +1,6 @@
 const { v1: uuid } = require("uuid");
+const Author = require("./models/author");
+const Book = require("./models/book");
 
 const {
   isExistingAuthor,
@@ -131,29 +133,29 @@ const resolvers = {
   },
 
   Mutation: {
-    addBook: (root, args) => {
-      const newBook = {
+    addBook: async (root, args) => {
+      const newBook = new Book({
         title: args.title,
-        author: args.author,
         published: args.published,
         genres: args.genres,
-        id: uuid(),
-      };
-      books = books.concat(newBook);
+      });
 
       // Add author if it does not exist yet:
-      const authorExists = isExistingAuthor(args.author, authors);
-      if (!authorExists) {
-        authors = authors.concat({
+      const existingAuthor = await Author.findOne({ name: args.author });
+      if (!existingAuthor) {
+        const newAuthor = new Author({
           name: args.author,
-          id: uuid(),
           bookCount: 1,
         });
+        await newAuthor.save();
+        newBook.author = newAuthor;
+      } else {
+        existingAuthor.bookCount += 1;
+        await existingAuthor.save();
+        newBook.author = existingAuthor;
       }
-      return {
-        ...newBook,
-        author: getAuthorByName(authors, newBook.author),
-      };
+      await newBook.save();
+      return newBook;
     },
 
     editAuthor: (root, args) => {
