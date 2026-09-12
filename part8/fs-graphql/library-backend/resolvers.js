@@ -1,4 +1,7 @@
 const { v1: uuid } = require("uuid");
+
+const { GraphQLError } = require("graphql/error");
+
 const Author = require("./models/author");
 const Book = require("./models/book");
 
@@ -44,14 +47,32 @@ const resolvers = {
           name: args.author,
           bookCount: 1,
         });
-        await newAuthor.save();
+        try {
+          await newAuthor.save();
+        } catch (error) {
+          throw new GraphQLError(error.message, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
         newBook.author = newAuthor;
       } else {
         existingAuthor.bookCount += 1;
-        await existingAuthor.save();
+        try {
+          await existingAuthor.save();
+        } catch (error) {
+          throw new GraphQLError(error.message, {
+            extensions: { code: "BAD_USER_INPUT" },
+          });
+        }
         newBook.author = existingAuthor;
       }
-      await newBook.save();
+      try {
+        await newBook.save();
+      } catch (error) {
+        throw new GraphQLError(error.message, {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
       return newBook;
     },
 
@@ -61,7 +82,13 @@ const resolvers = {
         return null;
       }
       authorToUpdate.born = args.setBornTo;
-      await authorToUpdate.save();
+      try {
+        await authorToUpdate.save();
+      } catch (error) {
+        throw new GraphQLError(error.message, {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
       return authorToUpdate;
     },
   },

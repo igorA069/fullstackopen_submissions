@@ -30,6 +30,9 @@ const NewBook = (props) => {
         setGenres([]);
         setGenre("");
       },
+      onError: (error) => {
+        console.log(error);
+      },
     });
   };
 

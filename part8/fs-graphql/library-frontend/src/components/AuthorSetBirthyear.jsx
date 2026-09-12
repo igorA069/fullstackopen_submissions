@@ -16,6 +16,9 @@ export const AuthorSetBirthyear = ({ authors }) => {
     e.preventDefault();
     editAuthorMutation({
       variables: { name: authorName, setBornTo: parseInt(birthYear) },
+      onError: (error) => {
+        console.log(error);
+      },
     });
   };
 
