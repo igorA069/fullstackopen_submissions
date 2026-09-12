@@ -20,7 +20,7 @@ const resolvers = {
         // todo
       }
       if (args.genre) {
-        // todo
+        searchCriteria.genres = args.genre;
       }
       const books = await Book.find(searchCriteria).populate("author");
       return books;
