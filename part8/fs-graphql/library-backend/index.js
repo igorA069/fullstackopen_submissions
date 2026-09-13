@@ -1,9 +1,7 @@
-const dotenv = require("dotenv");
+require("dotenv").config();
 
 const connectToDb = require("./db");
 const startServer = require("./server");
-
-dotenv.config();
 
 const BACKEND_PORT = process.env.BACKEND_PORT || 4000;
 

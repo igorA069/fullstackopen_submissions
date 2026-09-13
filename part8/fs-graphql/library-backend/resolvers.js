@@ -1,9 +1,11 @@
 const { v1: uuid } = require("uuid");
+const jwt = require("jsonwebtoken");
 
 const { GraphQLError } = require("graphql/error");
 
 const Author = require("./models/author");
 const Book = require("./models/book");
+const User = require("./models/user");
 
 const {
   isExistingAuthor,
@@ -30,6 +32,8 @@ const resolvers = {
     },
 
     allAuthors: async () => await Author.find({}),
+
+    //me:
   },
 
   Mutation: {
@@ -90,6 +94,36 @@ const resolvers = {
         });
       }
       return authorToUpdate;
+    },
+
+    createUser: async (root, args) => {
+      const newUser = new User({
+        username: args.username,
+        favoriteGenre: args.favoriteGenre,
+      });
+      try {
+        await newUser.save();
+        return newUser;
+      } catch (error) {
+        throw new GraphQLError(error.message, {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+    },
+
+    login: async (root, args) => {
+      const existingUser = await User.find({ username: args.username });
+      if (!existingUser || args.password != "topsecret") {
+        throw new GraphQLError("Invalid username or password", {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+      const token = jwt.sign(
+        { username: args.username },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h", subject: toString(existingUser._id) },
+      );
+      return { value: token };
     },
   },
 };
