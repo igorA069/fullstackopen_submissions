@@ -14,6 +14,10 @@ const {
 } = require("./utils");
 
 const resolvers = {
+  Author: {
+    bookCount: (root) => 0, // TODO: implement
+  },
+
   Query: {
     bookCount: async () => await Book.countDocuments({}),
 
@@ -39,9 +43,12 @@ const resolvers = {
   Mutation: {
     addBook: async (root, args, context) => {
       if (!context.currentUser) {
-        throw new GraphQLError("Operation permitted for logged in users only", {
-          extensions: { code: "UNAUTHORIZED" },
-        });
+        throw new GraphQLError(
+          "authentication is required to execute this action",
+          {
+            extensions: { code: "UNAUTHORIZED" },
+          },
+        );
       }
       const newBook = new Book({
         title: args.title,
@@ -54,7 +61,6 @@ const resolvers = {
       if (!existingAuthor) {
         const newAuthor = new Author({
           name: args.author,
-          bookCount: 1,
         });
         try {
           await newAuthor.save();
@@ -65,7 +71,6 @@ const resolvers = {
         }
         newBook.author = newAuthor;
       } else {
-        existingAuthor.bookCount += 1;
         try {
           await existingAuthor.save();
         } catch (error) {
@@ -87,15 +92,16 @@ const resolvers = {
 
     editAuthor: async (root, args, context) => {
       if (!context.currentUser) {
-        throw new GraphQLError("Operation permitted for logged in users only", {
-          extensions: { code: "UNAUTHORIZED" },
-        });
+        throw new GraphQLError(
+          "authentication is required to execute this action",
+          {
+            extensions: { code: "UNAUTHORIZED" },
+          },
+        );
       }
       const authorToUpdate = await Author.findOne({ name: args.name });
       if (!authorToUpdate) {
-        throw new GraphQLError("Cannot find author", {
-          extensions: { code: "BAD_USER_INPUT", args: args.name },
-        });
+        return null;
       }
       authorToUpdate.born = args.setBornTo;
       try {
@@ -125,7 +131,7 @@ const resolvers = {
 
     login: async (root, args) => {
       const existingUser = await User.findOne({ username: args.username });
-      if (!existingUser || args.password != "topsecret") {
+      if (!existingUser || args.password != "secret") {
         throw new GraphQLError("Invalid username or password", {
           extensions: { code: "BAD_USER_INPUT" },
         });
@@ -136,6 +142,16 @@ const resolvers = {
         { expiresIn: "1h", subject: existingUser.id },
       );
       return { value: token };
+    },
+
+    _resetDatabase: async () => {
+      if (process.env.NODE_ENV !== "test") {
+        throw new GraphQLError("_resetDatabase only to be used in testing");
+      } else {
+        await Author.deleteMany({});
+        await Book.deleteMany({});
+        await User.deleteMany({});
+      }
     },
   },
 };
