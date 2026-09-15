@@ -33,11 +33,16 @@ const resolvers = {
 
     allAuthors: async () => await Author.find({}),
 
-    //me:
+    me: (root, args, context) => context.currentUser,
   },
 
   Mutation: {
-    addBook: async (root, args) => {
+    addBook: async (root, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError("Operation permitted for logged in users only", {
+          extensions: { code: "UNAUTHORIZED" },
+        });
+      }
       const newBook = new Book({
         title: args.title,
         published: args.published,
@@ -80,10 +85,17 @@ const resolvers = {
       return newBook;
     },
 
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError("Operation permitted for logged in users only", {
+          extensions: { code: "UNAUTHORIZED" },
+        });
+      }
       const authorToUpdate = await Author.findOne({ name: args.name });
       if (!authorToUpdate) {
-        return null;
+        throw new GraphQLError("Cannot find author", {
+          extensions: { code: "BAD_USER_INPUT", args: args.name },
+        });
       }
       authorToUpdate.born = args.setBornTo;
       try {
@@ -112,7 +124,7 @@ const resolvers = {
     },
 
     login: async (root, args) => {
-      const existingUser = await User.find({ username: args.username });
+      const existingUser = await User.findOne({ username: args.username });
       if (!existingUser || args.password != "topsecret") {
         throw new GraphQLError("Invalid username or password", {
           extensions: { code: "BAD_USER_INPUT" },
@@ -121,7 +133,7 @@ const resolvers = {
       const token = jwt.sign(
         { username: args.username },
         process.env.JWT_SECRET,
-        { expiresIn: "1h", subject: toString(existingUser._id) },
+        { expiresIn: "1h", subject: existingUser.id },
       );
       return { value: token };
     },
