@@ -1,0 +1,1 @@
+Moved to https://github.com/igorA069/fullstack_graphql
